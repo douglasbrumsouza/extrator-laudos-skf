@@ -505,7 +505,7 @@ def render_dashboard(lista):
     st.markdown(f"""
     <div style="text-align:center;margin-top:16px;font-size:9px;color:rgba(255,255,255,0.2);
                 letter-spacing:.5px;padding-bottom:8px">
-      SKF TruVu 360 · Gerdau Charqueadas · Engenharia de Manutenção
+      SKF · Gerdau Charqueadas · Engenharia de Manutenção
       &nbsp;·&nbsp; Desenvolvido por Douglas Brum
       &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
     </div>
