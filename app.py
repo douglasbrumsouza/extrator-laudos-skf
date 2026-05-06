@@ -38,8 +38,15 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
 html,body,[class*="css"]{font-family:'Barlow',sans-serif!important}
 .stApp{background:linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%);min-height:100vh}
-#MainMenu,footer,header{visibility:hidden}
-.block-container{padding-top:1rem;padding-bottom:1rem;max-width:100%!important}
+/* Remove todo espaço superior */
+#MainMenu,footer,header{visibility:hidden!important;display:none!important}
+.stApp > header{display:none!important}
+[data-testid="stHeader"]{display:none!important}
+[data-testid="stToolbar"]{display:none!important}
+.block-container{padding-top:0!important;padding-bottom:1rem;max-width:100%!important}
+section[data-testid="stSidebar"]{display:none!important}
+/* Upload centralizado */
+.upload-outer{display:flex;justify-content:center;align-items:center;min-height:96vh;width:100%;padding:12px}
 
 /* Header */
 .db-header{background:linear-gradient(135deg,#1F4E79,#2E75B6);border-radius:12px;
@@ -296,7 +303,7 @@ def render_dashboard(lista):
         <div style="font-size:11px;color:#BDD7EE;margin-top:4px">
           Última coleta: {df['Data de coleta'].dropna().iloc[-1] if not df['Data de coleta'].dropna().empty else '—'} &nbsp;|&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')}
         </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
+        <div class="db-credit">Desenvolvido por Douglas Brum · Gerdau Charqueadas</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -310,7 +317,7 @@ def render_dashboard(lista):
     meses_disp = ["Todos"] + [meses_map[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     with col1:
-        setor_sel = st.selectbox("🏭  SETOR ", setores)
+        setor_sel = st.selectbox("🏭  SETOR (Cod2)", setores)
     with col2:
         ano_sel = st.selectbox("📅  ANO", anos)
     with col3:
@@ -507,7 +514,7 @@ def render_dashboard(lista):
                 letter-spacing:.5px;padding-bottom:8px">
       SKF · Gerdau Charqueadas · Engenharia de Manutenção
       &nbsp;·&nbsp; Desenvolvido por Douglas Brum
-      
+      &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
     </div>
     """, unsafe_allow_html=True)
 
@@ -515,10 +522,7 @@ def render_dashboard(lista):
 # TELA DE UPLOAD
 # ══════════════════════════════════════════════════════════════════════════════
 def render_upload():
-    st.markdown("""
-    <div style="display:flex;justify-content:center;align-items:center;min-height:80vh">
-    <div class="upload-card">
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="upload-outer"><div class="upload-card">', unsafe_allow_html=True)
 
     st.markdown("""
     <div class="upload-header">
@@ -585,7 +589,7 @@ def render_upload():
 
         st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · SKF </div>',
+    st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF </div>',
                 unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -622,10 +626,46 @@ def render_resultados():
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            use_container_width=True, type="primary")
     with c3:
-        if st.button("↩  Novo ZIP", use_container_width=True):
-            del st.session_state["laudos"]
-            del st.session_state["processado"]
-            st.rerun()
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("↩  Novo ZIP", use_container_width=True):
+                del st.session_state["laudos"]
+                del st.session_state["processado"]
+                st.rerun()
+        with col_b:
+            st.markdown("""
+            <button onclick="
+                var el = document.documentElement;
+                if(el.requestFullscreen) el.requestFullscreen();
+                else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+                else if(el.mozRequestFullScreen) el.mozRequestFullScreen();
+                else if(el.msRequestFullscreen) el.msRequestFullscreen();
+                setTimeout(function(){
+                    var hdr = document.querySelector('header[data-testid=stHeader]');
+                    var tbar = document.querySelector('[data-testid=stToolbar]');
+                    var menu = document.getElementById('MainMenu');
+                    if(hdr) hdr.style.display='none';
+                    if(tbar) tbar.style.display='none';
+                    if(menu) menu.style.display='none';
+                    document.querySelector('.block-container').style.paddingTop='0';
+                }, 400);
+            " style="width:100%;background:linear-gradient(135deg,#1F4E79,#2E75B6);
+                color:white;border:none;border-radius:8px;padding:8px 12px;
+                font-family:Barlow,sans-serif;font-size:13px;font-weight:600;
+                cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
+                height:38px;transition:all .2s"
+                onmouseover="this.style.opacity='0.85'"
+                onmouseout="this.style.opacity='1'">
+              ⛶ &nbsp;Apresentar
+            </button>
+            <script>
+            document.addEventListener('fullscreenchange', function(){
+                if(!document.fullscreenElement){
+                    // Ao sair do fullscreen, mantém aparência
+                }
+            });
+            </script>
+            """, unsafe_allow_html=True)
 
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
