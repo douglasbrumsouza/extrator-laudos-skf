@@ -505,7 +505,7 @@ def render_dashboard(lista):
     st.markdown(f"""
     <div style="text-align:center;margin-top:16px;font-size:9px;color:rgba(255,255,255,0.2);
                 letter-spacing:.5px;padding-bottom:8px">
-      SKF TruVu 360 · Gerdau Charqueadas · Engenharia de Manutenção
+      SKF · Gerdau Charqueadas · Engenharia de Manutenção
       &nbsp;·&nbsp; Desenvolvido por Douglas Brum
       &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
     </div>
@@ -526,7 +526,7 @@ def render_upload():
         <div class="db-logo">SKF</div>
         <div>
           <div class="db-title" style="font-size:20px">Extrator de Laudos SKF</div>
-          <div class="db-sub">TruVu 360 · Gerdau Charqueadas · Eng. de Manutenção</div>
+          <div class="db-sub"> Gerdau Charqueadas · Eng. de Manutenção</div>
         </div>
       </div>
       <div style="font-size:13px;color:rgba(255,255,255,0.78);line-height:1.6">
@@ -585,7 +585,7 @@ def render_upload():
 
         st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF TruVu 360</div>',
+    st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · SKF </div>',
                 unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
