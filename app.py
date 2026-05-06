@@ -38,8 +38,27 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
 html,body,[class*="css"]{font-family:'Barlow',sans-serif!important}
 .stApp{background:linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%);min-height:100vh}
-#MainMenu,footer,header{visibility:hidden}
-.block-container{padding-top:1rem;padding-bottom:1rem;max-width:100%!important}
+/* Remove todo espaço superior */
+#MainMenu,footer,header{visibility:hidden!important;display:none!important}
+.stApp > header{display:none!important}
+[data-testid="stHeader"]{display:none!important}
+[data-testid="stToolbar"]{display:none!important}
+.block-container{
+  padding-top:0!important;padding-bottom:0!important;
+  padding-left:0!important;padding-right:0!important;
+  max-width:100%!important;margin-top:0!important;
+}
+/* Remove qualquer espaço residual do Streamlit */
+.stApp{margin-top:0!important}
+div[data-testid="stVerticalBlock"]{gap:0!important}
+div[data-testid="stVerticalBlockBorderWrapper"]{padding:0!important}
+section[data-testid="stSidebar"]{display:none!important}
+/* Upload centralizado */
+.upload-outer{
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;width:100%;padding:16px;
+  margin-top:-4rem;  /* compensa padding do Streamlit */
+}
 
 /* Header */
 .db-header{background:linear-gradient(135deg,#1F4E79,#2E75B6);border-radius:12px;
@@ -516,78 +535,136 @@ def render_dashboard(lista):
 # ══════════════════════════════════════════════════════════════════════════════
 def render_upload():
     st.markdown("""
-    <div style="display:flex;justify-content:center;align-items:center;min-height:80vh">
-    <div class="upload-card">
+    <style>
+    /* Força centralização vertical perfeita */
+    section.main > div.block-container,
+    section.main > div.block-container > div,
+    section.main > div.block-container > div > div {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    .upload-wrapper {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: linear-gradient(135deg, #0D2137 0%, #1A3A5C 100%);
+        z-index: 1;
+    }
+    .upload-inner {
+        width: 100%;
+        max-width: 580px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+    }
+    .upload-head {
+        background: linear-gradient(135deg, #1F4E79, #2E75B6);
+        padding: 28px 32px;
+    }
+    .upload-head-row {
+        display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+    }
+    .upload-logo {
+        width: 48px; height: 48px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; font-weight: 700; color: white;
+        border: 1px solid rgba(255,255,255,0.25);
+        flex-shrink: 0;
+        font-family: "Barlow Condensed", sans-serif;
+    }
+    .upload-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-size: 22px; font-weight: 700;
+        color: white; letter-spacing: .5px; line-height: 1.1;
+    }
+    .upload-sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .upload-desc { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.6; }
+    .upload-body { padding: 28px 32px; }
+    .upload-steps {
+        background: #F0F6FF; border: 1px solid #C8DCEF;
+        border-radius: 10px; padding: 16px 20px;
+        font-size: 13px; color: #1F4E79; line-height: 2;
+    }
+    .upload-footer {
+        text-align: center; font-size: 10px;
+        color: rgba(255,255,255,0.3); margin-top: 16px; letter-spacing: .3px;
+    }
+    /* Esconde decoração do Streamlit */
+    [data-testid="stDecoration"] { display: none !important; }
+    </style>
+
+    <div class="upload-wrapper">
+      <div class="upload-inner">
+        <div class="upload-head">
+          <div class="upload-head-row">
+            <div class="upload-logo">SKF</div>
+            <div>
+              <div class="upload-title">Extrator de Laudos SKF</div>
+              <div class="upload-sub">TruVu 360 · Gerdau Charqueadas · Eng. de Manutenção</div>
+            </div>
+          </div>
+          <div class="upload-desc">
+            Faça o upload do ZIP com os laudos em PDF.<br>
+            Gera o <strong>Excel consolidado</strong> e o <strong>painel interativo</strong> automaticamente.
+          </div>
+        </div>
+        <div class="upload-body">
     """, unsafe_allow_html=True)
 
+    uploaded = st.file_uploader(
+        "📦 Selecione o arquivo ZIP com os laudos",
+        type=["zip"],
+        help="Arquivo .zip enviado pelo laboratório SKF com os PDFs dos laudos"
+    )
+
+    if uploaded:
+        st.success(f"✅ **{uploaded.name}** selecionado — {uploaded.size/1024/1024:.1f} MB")
+        if st.button("⚙️ Processar Laudos", type="primary", use_container_width=True):
+            with st.spinner("Processando laudos..."):
+                zf = zipfile.ZipFile(BytesIO(uploaded.read()))
+                pdfs = [(n, zf.read(n)) for n in zf.namelist()
+                        if n.lower().endswith(".pdf") and not n.startswith("__MACOSX")]
+            if not pdfs:
+                st.error("Nenhum PDF encontrado no ZIP.")
+                return
+            progress = st.progress(0)
+            lista, erros = [], []
+            for i,(nome,pdf_bytes) in enumerate(sorted(pdfs),1):
+                progress.progress(i/len(pdfs),
+                    text=f"Processando {i}/{len(pdfs)}: {os.path.basename(nome)[:45]}")
+                try:
+                    lista.append(extrair_laudo(os.path.basename(nome), pdf_bytes))
+                except Exception as e:
+                    erros.append(str(e))
+            progress.progress(1.0, text="Concluído!")
+            st.session_state["laudos"] = lista
+            st.session_state["processado"] = True
+            st.session_state["nome_excel"] = f"LAUDOS_{datetime.now().strftime('%d-%m-%Y')}.xlsx"
+            st.rerun()
+    else:
+        st.markdown("""
+        <div class="upload-steps">
+          📦 &nbsp;<strong>1.</strong> Receba o ZIP do laboratório SKF<br>
+          ⬆️ &nbsp;<strong>2.</strong> Selecione o arquivo acima<br>
+          ⚙️ &nbsp;<strong>3.</strong> Clique em <strong>Processar Laudos</strong><br>
+          📊 &nbsp;<strong>4.</strong> Veja o painel e baixe o Excel
+        </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("""
-    <div class="upload-header">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
-        <div class="db-logo">SKF</div>
-        <div>
-          <div class="db-title" style="font-size:20px">Extrator de Laudos SKF</div>
-          <div class="db-sub">TruVu 360 · Gerdau Charqueadas · Eng. de Manutenção</div>
         </div>
       </div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.78);line-height:1.6">
-        Faça o upload do ZIP com os laudos em PDF.<br>
-        Gera Excel consolidado <b>e</b> painel interativo automaticamente.
+      <div class="upload-footer">
+        Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF TruVu 360
       </div>
     </div>
     """, unsafe_allow_html=True)
-
-    with st.container():
-        st.markdown('<div class="upload-body">', unsafe_allow_html=True)
-        uploaded = st.file_uploader("📦 Selecione o arquivo ZIP com os laudos",
-                                     type=["zip"],
-                                     help="Arquivo .zip enviado pelo laboratório SKF")
-
-        if uploaded:
-            st.success(f"✅ **{uploaded.name}** — {uploaded.size/1024/1024:.1f} MB")
-
-            if st.button("⚙️ Processar Laudos", type="primary", use_container_width=True):
-                with st.spinner("Processando laudos..."):
-                    zf = zipfile.ZipFile(BytesIO(uploaded.read()))
-                    pdfs = [(n, zf.read(n)) for n in zf.namelist()
-                            if n.lower().endswith(".pdf") and not n.startswith("__MACOSX")]
-
-                if not pdfs:
-                    st.error("Nenhum PDF encontrado no ZIP.")
-                    return
-
-                progress = st.progress(0)
-                lista, erros = [], []
-                for i,(nome,pdf_bytes) in enumerate(sorted(pdfs),1):
-                    progress.progress(i/len(pdfs), text=f"Processando {i}/{len(pdfs)}: {os.path.basename(nome)[:45]}")
-                    try:
-                        lista.append(extrair_laudo(os.path.basename(nome), pdf_bytes))
-                    except Exception as e:
-                        erros.append(str(e))
-
-                progress.progress(1.0, text="Concluído!")
-
-                # Salva na sessão
-                st.session_state["laudos"] = lista
-                st.session_state["processado"] = True
-                st.session_state["nome_excel"] = f"LAUDOS_{datetime.now().strftime('%d-%m-%Y')}.xlsx"
-                st.rerun()
-
-        else:
-            st.markdown("""
-            <div style="background:rgba(31,78,121,0.15);border:1px solid rgba(46,117,182,0.2);
-                        border-radius:10px;padding:20px;font-size:13px;color:rgba(0,0,0,0.65);line-height:1.8">
-              📦 &nbsp;<b>1.</b> Receba o ZIP do laboratório<br>
-              ⬆️ &nbsp;<b>2.</b> Faça o upload acima<br>
-              ⚙️ &nbsp;<b>3.</b> Clique em Processar Laudos<br>
-              📊 &nbsp;<b>4.</b> Veja o painel interativo e baixe o Excel
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
-    st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF TruVu 360</div>',
-                unsafe_allow_html=True)
-
 # ══════════════════════════════════════════════════════════════════════════════
 # TELA DE RESULTADOS (após processar)
 # ══════════════════════════════════════════════════════════════════════════════
@@ -622,10 +699,83 @@ def render_resultados():
                            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                            use_container_width=True, type="primary")
     with c3:
-        if st.button("↩  Novo ZIP", use_container_width=True):
-            del st.session_state["laudos"]
-            del st.session_state["processado"]
-            st.rerun()
+        col_a, col_b = st.columns(2)
+        with col_a:
+            if st.button("↩  Novo ZIP", use_container_width=True):
+                del st.session_state["laudos"]
+                del st.session_state["processado"]
+                st.rerun()
+        with col_b:
+            import streamlit.components.v1 as components
+            components.html("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { background:transparent; }
+            button {
+                width:100%; height:38px;
+                background:linear-gradient(135deg,#1F4E79,#2E75B6);
+                color:white; border:none; border-radius:8px;
+                font-family:Barlow,sans-serif; font-size:13px; font-weight:600;
+                cursor:pointer; display:flex; align-items:center; justify-content:center;
+                gap:6px; transition:all .2s; letter-spacing:.3px;
+            }
+            button:hover { opacity:.85; transform:translateY(-1px); }
+            </style>
+            </head>
+            <body>
+            <button onclick="apresentar()">⛶ &nbsp;Apresentar</button>
+            <script>
+            function apresentar() {
+                // Pega o elemento raiz da página PAI (parent frame)
+                var parentDoc = window.parent.document;
+                var el = parentDoc.documentElement;
+
+                // Fullscreen na página pai
+                if (el.requestFullscreen) {
+                    el.requestFullscreen();
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                } else if (el.mozRequestFullScreen) {
+                    el.mozRequestFullScreen();
+                } else if (el.msRequestFullscreen) {
+                    el.msRequestFullscreen();
+                }
+
+                // Esconde elementos do Streamlit na página pai
+                setTimeout(function() {
+                    var selectors = [
+                        'header[data-testid="stHeader"]',
+                        '[data-testid="stToolbar"]',
+                        '#MainMenu',
+                        '[data-testid="stDecoration"]',
+                        '[data-testid="stStatusWidget"]'
+                    ];
+                    selectors.forEach(function(sel) {
+                        var el = parentDoc.querySelector(sel);
+                        if (el) el.style.display = 'none';
+                    });
+                    // Remove padding do container
+                    var bc = parentDoc.querySelector('.block-container');
+                    if (bc) {
+                        bc.style.paddingTop = '0';
+                        bc.style.paddingBottom = '0';
+                    }
+                }, 600);
+            }
+
+            // Ao pressionar ESC ou sair do fullscreen, restaura
+            window.parent.document.addEventListener('fullscreenchange', function() {
+                if (!window.parent.document.fullscreenElement) {
+                    // saiu do fullscreen — pode restaurar elementos se quiser
+                }
+            });
+            </script>
+            </body>
+            </html>
+            """, height=42)
 
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
