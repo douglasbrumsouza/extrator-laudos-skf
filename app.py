@@ -130,9 +130,9 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 
 /* ── CORREÇÃO DE ALINHAMENTO DA ACTION BAR ── */
 .act-bar {
-    background: #0D2137; border: 1px solid #1A3A5C; border-radius: 8px; /* Combinando com raio dos botões */
+    background: #0D2137; border: 1px solid #1A3A5C; border-radius: 8px;
     padding: 0 16px; display: flex; align-items: center; gap: 10px;
-    height: 42px; margin-bottom: 0px; margin-top: 2px; /* Altura exata para alinhar com st.button */
+    height: 42px; margin-bottom: 0px; margin-top: 2px;
 }
 .act-title {
     font-family: 'Barlow Condensed',sans-serif; font-size: 15px;
@@ -168,11 +168,11 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── SECTION CARDS (Tabela preservada) ── */
+/* ── SECTION CARDS ── */
 .sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px;
       padding:12px 14px; }
 
-/* ── CORREÇÃO DAS CAIXAS DOS GRÁFICOS (Unindo Título + Plotly nativo) ── */
+/* ── CORREÇÃO DAS CAIXAS DOS GRÁFICOS ── */
 .sc-top {
     background:#112035; border:1px solid #1A3A5C; border-bottom:none;
     border-radius:10px 10px 0 0; padding:12px 14px 4px 14px;
@@ -183,7 +183,7 @@ div[data-testid="stPlotlyChart"] {
     border-top: none;
     border-radius: 0 0 10px 10px;
     padding: 0 10px 10px 10px;
-    margin-top: -12px !important; /* Puxa o gráfico para colar na caixa de título */
+    margin-top: -12px !important;
 }
 
 .st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
@@ -213,10 +213,11 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.15); color:#F59E0B; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(76,175,80,.15);  color:#4CAF50; border:1px solid rgba(76,175,80,.3); }
 
-/* ── Selectbox ── */
+/* ── Selectbox Labels ── */
 div[data-testid="stSelectbox"] label {
-    color:#BDD7EE !important; font-size:9px !important;
+    color:#BDD7EE !important; font-size:10px !important;
     text-transform:uppercase; letter-spacing:.8px;
+    margin-bottom: 4px !important; /* Afasta um pouco do input para ficar mais alinhado */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -456,7 +457,7 @@ def render_upload():
     </html>
     """, height=440)
 
-    # Widgets Streamlit — Renderizados na raiz (o CSS cuidará de centralizar e travar em 540px)
+    # Widgets Streamlit — Renderizados na raiz
     uploaded = st.file_uploader(
         "📦 Selecione o arquivo ZIP com os laudos",
         type=["zip"],
@@ -531,7 +532,7 @@ def render_dashboard(lista):
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:transparent; font-family:'Barlow',sans-serif; }
         button {
-            width:100%; height:40px; /* Corrigido para encaixe perfeito */
+            width:100%; height:40px; 
             background: linear-gradient(135deg,#1F4E79,#2E75B6);
             color:white; border:none; border-radius:8px;
             font-size:13px; font-weight:600; cursor:pointer;
@@ -560,202 +561,3 @@ def render_dashboard(lista):
                         '[data-testid="stToolbar"]',
                         '[data-testid="stDecoration"]',
                         '[data-testid="stStatusWidget"]',
-                        '#MainMenu', 'footer'
-                    ];
-                    sels.forEach(function(s) {
-                        var el = doc.querySelector(s);
-                        if (el) el.style.cssText = 'display:none!important';
-                    });
-                    // Zera padding do container
-                    var bc = doc.querySelector('.block-container');
-                    if (bc) { bc.style.paddingTop='0.3rem'; bc.style.paddingBottom='0'; }
-                }
-                hide();
-                setTimeout(hide, 500);
-                setTimeout(hide, 1200);
-            } catch(e) { console.log('Fullscreen error:', e); }
-        }
-        </script>
-        """, height=42) # Ajustado height para 42 alinhando com a barra de ação
-
-    # ── Header do dashboard ────────────────────────────────────────────────────
-    ultima = df["Data de coleta"].dropna().iloc[-1] if not df["Data de coleta"].dropna().empty else "—"
-    st.markdown(f"""
-    <div class="db-header">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="db-logo">SKF</div>
-        <div>
-          <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
-          <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção · TruVu 360</div>
-        </div>
-      </div>
-      <div style="text-align:right">
-        <div class="db-badge">● AO VIVO</div>
-        <div style="font-size:10px;color:#BDD7EE;margin-top:3px">
-          Última coleta: {ultima} &nbsp;|&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')}
-        </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · Gerdau Charqueadas</div>
-      </div>
-    </div>""", unsafe_allow_html=True)
-
-    # ── Filtros ────────────────────────────────────────────────────────────────
-    setores = ["Todos"] + sorted(df["Cod2"].dropna().unique().tolist())
-    anos    = ["Todos"] + sorted(df["Ano coleta"].dropna().astype(int).unique().tolist(), reverse=True)
-    meses_disp = ["Todos"] + [MESES_F[m] for m in
-                  sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
-
-    fc1, fc2, fc3 = st.columns([2, 1, 1])
-    with fc1: setor_sel = st.selectbox("🏭  SETOR (Cod2)", setores, label_visibility="visible")
-    with fc2: ano_sel   = st.selectbox("📅  ANO",          anos,    label_visibility="visible")
-    with fc3: mes_sel   = st.selectbox("📆  MÊS",          meses_disp, label_visibility="visible")
-
-    dff = df.copy()
-    if setor_sel != "Todos": dff = dff[dff["Cod2"] == setor_sel]
-    if ano_sel   != "Todos": dff = dff[dff["Ano coleta"] == int(ano_sel)]
-    if mes_sel   != "Todos":
-        mn = {v: k for k, v in MESES_F.items()}[mes_sel]
-        dff = dff[dff["Mês coleta"] == mn]
-
-    total = len(dff)
-    norm  = len(dff[dff["Status"]=="Normal"])
-    alt   = len(dff[dff["Status"]=="Alerta"])
-    alm   = len(dff[dff["Status"]=="Alarme"])
-    pn = f"{norm/total*100:.0f}%" if total else "0%"
-    pa = f"{alt/total*100:.0f}%"  if total else "0%"
-    pm = f"{alm/total*100:.0f}%"  if total else "0%"
-
-    # ── KPIs ──────────────────────────────────────────────────────────────────
-    k1, k2, k3, k4 = st.columns(4)
-    kpis = [
-        (k1,"kpi-tot kpi",total,"TOTAL DE ATIVOS","laudos no período"),
-        (k2,"kpi-nor kpi",norm,"NORMAL",f"{pn} da frota"),
-        (k3,"kpi-alt kpi",alt,"ALERTA",f"{pa} da frota"),
-        (k4,"kpi-alm kpi",alm,"ALARME",f"{pm} da frota"),
-    ]
-    for col, cls, val, lbl, sub in kpis:
-        with col:
-            st.markdown(f"""
-            <div class="{cls}">
-              <div class="kv">{val}</div>
-              <div class="kl">{lbl}</div>
-              <div class="ks">{sub}</div>
-            </div>""", unsafe_allow_html=True)
-
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
-
-    # ── Gráficos ───────────────────────────────────────────────────────────────
-    g1, g2, g3 = st.columns([3, 1.2, 1.2])
-    COR = {"Normal":"#639922","Alerta":"#BA7517","Alarme":"#E24B4A"}
-    LAYOUT = dict(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-                  font=dict(color="#8AAABB",family="Barlow"),
-                  margin=dict(l=0,r=0,t=4,b=30))
-
-    with g1:
-        # FECHANDO a tag da caixa superior Imediatamente para evitar quebra do DOM
-        st.markdown('<div class="sc-top"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
-        if not dff.empty:
-            db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
-            db["tot"] = db.groupby("Cod2")["n"].transform("sum")
-            db["pct"] = (db["n"] / db["tot"] * 100).round(1)
-            fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
-                         barmode="stack", color_discrete_map=COR, text="pct",
-                         category_orders={"Status":["Normal","Alerta","Alarme"]})
-            fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
-                              textfont_size=10, textfont_color="white")
-            fig.update_layout(**LAYOUT, height=200,
-                xaxis=dict(showgrid=False,showticklabels=False,range=[0,100]),
-                yaxis=dict(showgrid=False,tickfont=dict(color="white",size=12,family="Barlow Condensed")),
-                legend=dict(orientation="h",y=-0.18,x=0,font=dict(color="#8AAABB",size=10),
-                            bgcolor="rgba(0,0,0,0)"),
-                bargap=0.3)
-            st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
-
-    with g2:
-        st.markdown('<div class="sc-top"><div class="st">Distribuição</div></div>', unsafe_allow_html=True)
-        if not dff.empty and total > 0:
-            dp = dff["Status"].value_counts().reset_index()
-            dp.columns = ["Status","n"]
-            fig2 = go.Figure(go.Pie(
-                labels=dp["Status"], values=dp["n"], hole=0.55,
-                marker_colors=[COR.get(s,"#666") for s in dp["Status"]],
-                textinfo="percent", textfont_size=11, textfont_color="white",
-                hovertemplate="%{label}: %{value}<extra></extra>"
-            ))
-            fig2.add_annotation(text=f"<b>{total}</b>", x=0.5, y=0.5,
-                font=dict(size=24,color="white",family="Barlow Condensed"), showarrow=False)
-            fig2.update_layout(**LAYOUT, height=200,
-                showlegend=True,
-                legend=dict(orientation="v",x=0,y=0.5,
-                            font=dict(color="#8AAABB",size=9),
-                            bgcolor="rgba(0,0,0,0)"))
-            st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
-
-    with g3:
-        st.markdown('<div class="sc-top"><div class="st">Coletas por Mês</div></div>', unsafe_allow_html=True)
-        if not dff.empty:
-            dm = dff.groupby("Mês coleta").size().reset_index(name="n").sort_values("Mês coleta")
-            dm["label"] = dm["Mês coleta"].map(lambda x: MESES.get(int(x),"") if pd.notna(x) else "")
-            fig3 = go.Figure(go.Bar(
-                x=dm["label"], y=dm["n"], marker_color="#2E75B6",
-                text=dm["n"], textposition="outside",
-                textfont=dict(color="#8AAABB",size=10),
-                hovertemplate="%{x}: %{y} laudos<extra></extra>"
-            ))
-            fig3.update_layout(**LAYOUT, height=200,
-                xaxis=dict(showgrid=False,tickfont=dict(color="#8AAABB",size=10)),
-                yaxis=dict(showgrid=False,showticklabels=False))
-            st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
-
-    # ── Tabela (A Tabela estava correta pois encapsula apenas HTML) ─────────────
-    st.markdown('<div class="sc"><div class="st">Equipamentos com Desvio — Ação Necessária</div>', unsafe_allow_html=True)
-
-    dtab = dff[dff["Status"].isin(["Alarme","Alerta"])].sort_values("Status")
-    if dtab.empty:
-        st.markdown('<p style="color:#3A7D44;text-align:center;padding:16px">✅ Nenhum equipamento com desvio no período.</p>', unsafe_allow_html=True)
-    else:
-        rows = ""
-        for _, r in dtab.iterrows():
-            st_val   = r.get("Status","")
-            bcls     = "ba" if st_val=="Alarme" else "bl"
-            ferro    = r.get("Ferro (ppm)")
-            agua     = r.get("Água (ppm)")
-            visc     = r.get("Visc 40 (cSt)")
-            fc = "td-red" if ferro and ferro>30 else ("td-yel" if ferro and ferro>15 else "")
-            ac = "td-red" if agua  and agua>800  else ("td-yel" if agua  and agua>200  else "")
-            vc = "td-yel" if visc else ""
-            rows += f"""<tr>
-              <td class="td-set">{r.get('Cod2','')}</td>
-              <td style="color:#5A8AAA;font-size:11px">{r.get('Cod3','')}</td>
-              <td class="td-eq">{str(r.get('Equipamento Descrição 1','') or '')}</td>
-              <td><span class="badge {bcls}">{st_val}</span></td>
-              <td class="td-par">{str(r.get('Parâmetros em Alarme','') or '—')}</td>
-              <td class="td-obs">{str(r.get('Observações','') or '')[:55]}</td>
-              <td class="{fc}">{ferro if ferro is not None else '—'}</td>
-              <td class="{ac}">{agua  if agua  is not None else '—'}</td>
-              <td class="{vc}">{visc  if visc  is not None else '—'}</td>
-              <td class="td-data">{str(r.get('Data de coleta','') or '')[:10]}</td>
-            </tr>"""
-        st.markdown(f"""
-        <div style="overflow:hidden;border-radius:8px">
-        <table class="tbl"><thead><tr>
-          <th>Setor</th><th>Área</th><th>Equipamento</th><th>Status</th>
-          <th>Parâmetro</th><th>Observações</th>
-          <th>Ferro (ppm)</th><th>Água (ppm)</th><th>Visc 40</th><th>Coleta</th>
-        </tr></thead><tbody>{rows}</tbody></table></div>""", unsafe_allow_html=True)
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    # Rodapé
-    st.markdown(f"""
-    <div style="text-align:center;margin-top:10px;font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:.4px">
-      SKF TruVu 360 · Gerdau Charqueadas · Engenharia de Manutenção &nbsp;·&nbsp;
-      Desenvolvido por Douglas Brum &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
-    </div>""", unsafe_allow_html=True)
-
-# ══════════════════════════════════════════════════════════════════════════════
-# ROTEADOR
-# ══════════════════════════════════════════════════════════════════════════════
-if st.session_state.get("processado"):
-    render_dashboard(st.session_state["laudos"])
-else:
-    render_upload()
