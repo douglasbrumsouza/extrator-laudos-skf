@@ -217,7 +217,7 @@ div[data-testid="stPlotlyChart"] {
 div[data-testid="stSelectbox"] label {
     color:#BDD7EE !important; font-size:10px !important;
     text-transform:uppercase; letter-spacing:.8px;
-    margin-bottom: 4px !important; /* Afasta um pouco do input para ficar mais alinhado */
+    margin-bottom: 4px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -621,36 +621,37 @@ def render_dashboard(lista):
     pa = f"{alt/total*100:.0f}%"  if total else "0%"
     pm = f"{alm/total*100:.0f}%"  if total else "0%"
 
-    # ── KPIs (Malha 2:1:1 para Alinhamento Perfeito) ───────────────────────────
-    kc1, kc2, kc3 = st.columns([2, 1, 1])
+    # ── KPIs (Malha Nativa de 4 Colunas para Alinhamento Matemático Perfeito) ──
+    # Removido o flexbox customizado. Agora as caixas fecham no prumo com as extremidades.
+    kc1, kc2, kc3, kc4 = st.columns(4)
     
     with kc1:
-        # Coloca o Total e o Normal dividindo o mesmo espaço (equivalente à coluna 2)
         st.markdown(f"""
-        <div style="display:flex; gap:1rem; width:100%;">
-          <div class="kpi-tot kpi" style="flex:1;">
-            <div class="kv">{total}</div>
-            <div class="kl">TOTAL DE ATIVOS</div>
-            <div class="ks">laudos no período</div>
-          </div>
-          <div class="kpi-nor kpi" style="flex:1;">
-            <div class="kv">{norm}</div>
-            <div class="kl">NORMAL</div>
-            <div class="ks">{pn} da frota</div>
-          </div>
+        <div class="kpi-tot kpi">
+          <div class="kv">{total}</div>
+          <div class="kl">TOTAL DE ATIVOS</div>
+          <div class="ks">laudos no período</div>
         </div>""", unsafe_allow_html=True)
 
     with kc2:
         st.markdown(f"""
-        <div class="kpi-alt kpi" style="width:100%;">
+        <div class="kpi-nor kpi">
+          <div class="kv">{norm}</div>
+          <div class="kl">NORMAL</div>
+          <div class="ks">{pn} da frota</div>
+        </div>""", unsafe_allow_html=True)
+
+    with kc3:
+        st.markdown(f"""
+        <div class="kpi-alt kpi">
           <div class="kv">{alt}</div>
           <div class="kl">ALERTA</div>
           <div class="ks">{pa} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    with kc3:
+    with kc4:
         st.markdown(f"""
-        <div class="kpi-alm kpi" style="width:100%;">
+        <div class="kpi-alm kpi">
           <div class="kv">{alm}</div>
           <div class="kl">ALARME</div>
           <div class="ks">{pm} da frota</div>
