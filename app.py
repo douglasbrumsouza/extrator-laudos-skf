@@ -315,7 +315,7 @@ def render_dashboard(lista):
         <div style="font-size:11px;color:#BDD7EE;margin-top:4px">
           Última coleta: {df['Data de coleta'].dropna().iloc[-1] if not df['Data de coleta'].dropna().empty else '—'} &nbsp;|&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')}
         </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · Gerdau Charqueadas</div>
+        <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
