@@ -288,7 +288,7 @@ def render_dashboard(lista):
         <div class="db-logo">SKF</div>
         <div>
           <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
-          <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção · TruVu 360</div>
+          <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção </div>
         </div>
       </div>
       <div style="text-align:right">
@@ -296,7 +296,7 @@ def render_dashboard(lista):
         <div style="font-size:11px;color:#BDD7EE;margin-top:4px">
           Última coleta: {df['Data de coleta'].dropna().iloc[-1] if not df['Data de coleta'].dropna().empty else '—'} &nbsp;|&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')}
         </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · Gerdau Charqueadas</div>
+        <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
       </div>
     </div>
     """, unsafe_allow_html=True)
@@ -505,7 +505,7 @@ def render_dashboard(lista):
     st.markdown(f"""
     <div style="text-align:center;margin-top:16px;font-size:9px;color:rgba(255,255,255,0.2);
                 letter-spacing:.5px;padding-bottom:8px">
-      SKF · Gerdau Charqueadas · Engenharia de Manutenção
+      SKF TruVu 360 · Gerdau Charqueadas · Engenharia de Manutenção
       &nbsp;·&nbsp; Desenvolvido por Douglas Brum
       &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
     </div>
