@@ -90,6 +90,18 @@ div[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
     color: rgba(255,255,255,0.3); margin-top: 14px; letter-spacing: .4px;
 }
 
+/* ── CORREÇÃO DE ALINHAMENTO DA TELA DE UPLOAD ── */
+div[data-testid="stFileUploader"],
+div[data-testid="stSpinner"],
+div[data-testid="stAlert"],
+div.stProgress {
+    width: 100% !important;
+    max-width: 540px !important;
+    margin: 10px auto !important;
+}
+div[data-testid="stButton"] { display: flex; justify-content: center; }
+div[data-testid="stButton"] > button { max-width: 540px; }
+
 /* ── DASHBOARD ── */
 .db-header {
     background: linear-gradient(135deg,#1F4E79,#2E75B6);
@@ -116,11 +128,11 @@ div[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
 }
 .db-credit { font-size: 8px; color: rgba(255,255,255,0.22); margin-top: 3px; text-align:right; }
 
-/* ── ACTION BAR ── */
+/* ── CORREÇÃO DE ALINHAMENTO DA ACTION BAR ── */
 .act-bar {
-    background: #0D2137; border: 1px solid #1A3A5C; border-radius: 10px;
-    padding: 9px 16px; display: flex; align-items: center; gap: 10px;
-    margin-bottom: 6px;
+    background: #0D2137; border: 1px solid #1A3A5C; border-radius: 8px; /* Combinando com raio dos botões */
+    padding: 0 16px; display: flex; align-items: center; gap: 10px;
+    height: 42px; margin-bottom: 0px; margin-top: 2px; /* Altura exata para alinhar com st.button */
 }
 .act-title {
     font-family: 'Barlow Condensed',sans-serif; font-size: 15px;
@@ -156,9 +168,24 @@ div[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── SECTION CARDS ── */
+/* ── SECTION CARDS (Tabela preservada) ── */
 .sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px;
       padding:12px 14px; }
+
+/* ── CORREÇÃO DAS CAIXAS DOS GRÁFICOS (Unindo Título + Plotly nativo) ── */
+.sc-top {
+    background:#112035; border:1px solid #1A3A5C; border-bottom:none;
+    border-radius:10px 10px 0 0; padding:12px 14px 4px 14px;
+}
+div[data-testid="stPlotlyChart"] {
+    background: #112035;
+    border: 1px solid #1A3A5C;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    padding: 0 10px 10px 10px;
+    margin-top: -12px !important; /* Puxa o gráfico para colar na caixa de título */
+}
+
 .st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
       color:#BDD7EE; display:flex; align-items:center; gap:6px; margin-bottom:8px; }
 .st::before { content:''; display:inline-block; width:3px; height:12px;
@@ -354,7 +381,6 @@ def gerar_excel(lista):
 # TELA DE UPLOAD
 # ══════════════════════════════════════════════════════════════════════════════
 def render_upload():
-    # Injeta HTML da tela de upload via componente para não ter padding Streamlit
     components.html("""
     <!DOCTYPE html>
     <html>
@@ -430,40 +456,38 @@ def render_upload():
     </html>
     """, height=440)
 
-    # Widgets Streamlit — upload e botão
-    col_l, col_c, col_r = st.columns([1, 3, 1])
-    with col_c:
-        uploaded = st.file_uploader(
-            "📦 Selecione o arquivo ZIP com os laudos",
-            type=["zip"],
-            label_visibility="collapsed"
-        )
-        if uploaded:
-            st.success(f"✅ **{uploaded.name}** — {uploaded.size/1024/1024:.1f} MB")
-            if st.button("⚙️  Processar Laudos", type="primary", use_container_width=True):
-                with st.spinner("Processando laudos..."):
-                    zf = zipfile.ZipFile(BytesIO(uploaded.read()))
-                    pdfs = [(n, zf.read(n)) for n in zf.namelist()
-                            if n.lower().endswith(".pdf") and not n.startswith("__MACOSX")]
-                if not pdfs:
-                    st.error("Nenhum PDF encontrado no ZIP."); return
-                prog = st.progress(0)
-                lista = []
-                for i, (nome, pdf_bytes) in enumerate(sorted(pdfs), 1):
-                    prog.progress(i / len(pdfs),
-                        text=f"Processando {i}/{len(pdfs)}: {os.path.basename(nome)[:45]}")
-                    try: lista.append(extrair_laudo(os.path.basename(nome), pdf_bytes))
-                    except: pass
-                prog.progress(1.0, text="Concluído!")
-                st.session_state["laudos"] = lista
-                st.session_state["processado"] = True
-                st.session_state["excel"] = f"LAUDOS_{datetime.now().strftime('%d-%m-%Y')}.xlsx"
-                st.rerun()
-        else:
-            st.markdown("""
-            <p style="text-align:center;color:rgba(255,255,255,0.4);font-size:12px;margin-top:4px">
-            Arraste o arquivo ZIP aqui ou clique para selecionar
-            </p>""", unsafe_allow_html=True)
+    # Widgets Streamlit — Renderizados na raiz (o CSS cuidará de centralizar e travar em 540px)
+    uploaded = st.file_uploader(
+        "📦 Selecione o arquivo ZIP com os laudos",
+        type=["zip"],
+        label_visibility="collapsed"
+    )
+    if uploaded:
+        st.success(f"✅ **{uploaded.name}** — {uploaded.size/1024/1024:.1f} MB")
+        if st.button("⚙️  Processar Laudos", type="primary", use_container_width=True):
+            with st.spinner("Processando laudos..."):
+                zf = zipfile.ZipFile(BytesIO(uploaded.read()))
+                pdfs = [(n, zf.read(n)) for n in zf.namelist()
+                        if n.lower().endswith(".pdf") and not n.startswith("__MACOSX")]
+            if not pdfs:
+                st.error("Nenhum PDF encontrado no ZIP."); return
+            prog = st.progress(0)
+            lista = []
+            for i, (nome, pdf_bytes) in enumerate(sorted(pdfs), 1):
+                prog.progress(i / len(pdfs),
+                    text=f"Processando {i}/{len(pdfs)}: {os.path.basename(nome)[:45]}")
+                try: lista.append(extrair_laudo(os.path.basename(nome), pdf_bytes))
+                except: pass
+            prog.progress(1.0, text="Concluído!")
+            st.session_state["laudos"] = lista
+            st.session_state["processado"] = True
+            st.session_state["excel"] = f"LAUDOS_{datetime.now().strftime('%d-%m-%Y')}.xlsx"
+            st.rerun()
+    else:
+        st.markdown("""
+        <p style="text-align:center;color:rgba(255,255,255,0.4);font-size:12px;margin-top:4px;width:100%;max-width:540px;margin-left:auto;margin-right:auto;">
+        Arraste o arquivo ZIP aqui ou clique para selecionar
+        </p>""", unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DASHBOARD
@@ -502,13 +526,12 @@ def render_dashboard(lista):
                 st.session_state.pop(k, None)
             st.rerun()
     with c4:
-        # Botão Apresentar via components.html (único jeito de ter JS real)
         components.html("""
         <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:transparent; font-family:'Barlow',sans-serif; }
         button {
-            width:100%; height:40px;
+            width:100%; height:40px; /* Corrigido para encaixe perfeito */
             background: linear-gradient(135deg,#1F4E79,#2E75B6);
             color:white; border:none; border-radius:8px;
             font-size:13px; font-weight:600; cursor:pointer;
@@ -552,15 +575,8 @@ def render_dashboard(lista):
                 setTimeout(hide, 1200);
             } catch(e) { console.log('Fullscreen error:', e); }
         }
-
-        // Ao sair do fullscreen (Esc), pode restaurar se quiser
-        try {
-            window.parent.document.addEventListener('fullscreenchange', function() {
-                // opcional: restaurar elementos
-            });
-        } catch(e) {}
         </script>
-        """, height=44)
+        """, height=42) # Ajustado height para 42 alinhando com a barra de ação
 
     # ── Header do dashboard ────────────────────────────────────────────────────
     ultima = df["Data de coleta"].dropna().iloc[-1] if not df["Data de coleta"].dropna().empty else "—"
@@ -635,7 +651,8 @@ def render_dashboard(lista):
                   margin=dict(l=0,r=0,t=4,b=30))
 
     with g1:
-        st.markdown('<div class="sc"><div class="st">Status por Setor (Cod2)</div>', unsafe_allow_html=True)
+        # FECHANDO a tag da caixa superior Imediatamente para evitar quebra do DOM
+        st.markdown('<div class="sc-top"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
@@ -652,10 +669,9 @@ def render_dashboard(lista):
                             bgcolor="rgba(0,0,0,0)"),
                 bargap=0.3)
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with g2:
-        st.markdown('<div class="sc"><div class="st">Distribuição</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-top"><div class="st">Distribuição</div></div>', unsafe_allow_html=True)
         if not dff.empty and total > 0:
             dp = dff["Status"].value_counts().reset_index()
             dp.columns = ["Status","n"]
@@ -673,10 +689,9 @@ def render_dashboard(lista):
                             font=dict(color="#8AAABB",size=9),
                             bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
-        st.markdown('</div>', unsafe_allow_html=True)
 
     with g3:
-        st.markdown('<div class="sc"><div class="st">Coletas por Mês</div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-top"><div class="st">Coletas por Mês</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             dm = dff.groupby("Mês coleta").size().reset_index(name="n").sort_values("Mês coleta")
             dm["label"] = dm["Mês coleta"].map(lambda x: MESES.get(int(x),"") if pd.notna(x) else "")
@@ -690,9 +705,8 @@ def render_dashboard(lista):
                 xaxis=dict(showgrid=False,tickfont=dict(color="#8AAABB",size=10)),
                 yaxis=dict(showgrid=False,showticklabels=False))
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
-        st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── Tabela ─────────────────────────────────────────────────────────────────
+    # ── Tabela (A Tabela estava correta pois encapsula apenas HTML) ─────────────
     st.markdown('<div class="sc"><div class="st">Equipamentos com Desvio — Ação Necessária</div>', unsafe_allow_html=True)
 
     dtab = dff[dff["Status"].isin(["Alarme","Alerta"])].sort_values("Status")
