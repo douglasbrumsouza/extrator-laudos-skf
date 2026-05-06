@@ -310,7 +310,7 @@ def render_dashboard(lista):
     meses_disp = ["Todos"] + [meses_map[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     with col1:
-        setor_sel = st.selectbox("🏭  SETOR (Cod2)", setores)
+        setor_sel = st.selectbox("🏭  SETOR ", setores)
     with col2:
         ano_sel = st.selectbox("📅  ANO", anos)
     with col3:
@@ -507,7 +507,7 @@ def render_dashboard(lista):
                 letter-spacing:.5px;padding-bottom:8px">
       SKF · Gerdau Charqueadas · Engenharia de Manutenção
       &nbsp;·&nbsp; Desenvolvido por Douglas Brum
-      &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
+      
     </div>
     """, unsafe_allow_html=True)
 
