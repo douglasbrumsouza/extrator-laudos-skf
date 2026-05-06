@@ -48,7 +48,9 @@ section[data-testid="stSidebar"] { display: none !important; }
     margin-top: 0 !important;
 }
 .stApp { background: linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%) !important; }
-div[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
+
+/* ── REDUÇÃO DO ESPAÇAMENTO VERTICAL (GAPS) ── */
+div[data-testid="stVerticalBlock"] { gap: 0.1rem !important; }
 
 /* ── UPLOAD SCREEN ── */
 .up-wrap {
@@ -145,7 +147,8 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 
 /* ── KPI CARDS ── */
 .kpi { border-radius: 10px; padding: 13px 14px; text-align: center;
-       border: 1px solid transparent; position: relative; overflow: hidden; }
+       border: 1px solid transparent; position: relative; overflow: hidden; 
+       margin-bottom: 4px !important; /* Ajuste fino de distância do KPI para os Gráficos */ }
 .kpi::before { content:''; position:absolute; top:0; left:0; right:0;
                height:3px; border-radius:10px 10px 0 0; }
 .kpi-tot { background:#162E4A; border-color:#2A4A6A; }
@@ -213,7 +216,10 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.15); color:#F59E0B; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(76,175,80,.15);  color:#4CAF50; border:1px solid rgba(76,175,80,.3); }
 
-/* ── Selectbox Labels ── */
+/* ── Selectbox Labels & SPACING ── */
+div[data-testid="stSelectbox"] {
+    margin-bottom: -18px !important; /* Puxa agressivamente a linha dos KPIs para colar na dos Filtros */
+}
 div[data-testid="stSelectbox"] label {
     color:#BDD7EE !important; font-size:10px !important;
     text-transform:uppercase; letter-spacing:.8px;
@@ -440,7 +446,7 @@ def render_upload():
         </div>
         <div class="desc">
           Faça o upload do ZIP com os laudos em PDF.<br>
-          Gera o <strong>Excel consolidado</strong> e o <strong>painel interativo</strong> automaticamente.
+          Gera o <strong>Excel consolidado</strong> e o <strong>painel interativo</strong> automatically.
         </div>
       </div>
       <div class="body">
@@ -622,7 +628,6 @@ def render_dashboard(lista):
     pm = f"{alm/total*100:.0f}%"  if total else "0%"
 
     # ── KPIs (Malha Nativa de 4 Colunas para Alinhamento Matemático Perfeito) ──
-    # Removido o flexbox customizado. Agora as caixas fecham no prumo com as extremidades.
     kc1, kc2, kc3, kc4 = st.columns(4)
     
     with kc1:
@@ -657,7 +662,7 @@ def render_dashboard(lista):
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
+    # ATENÇÃO: A linha vazia em HTML que criava aquele buracão entre os KPIs e os Gráficos foi removida daqui!
 
     # ── Gráficos (Malha 2:1:1 para Alinhamento Perfeito) ───────────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
