@@ -43,10 +43,22 @@ html,body,[class*="css"]{font-family:'Barlow',sans-serif!important}
 .stApp > header{display:none!important}
 [data-testid="stHeader"]{display:none!important}
 [data-testid="stToolbar"]{display:none!important}
-.block-container{padding-top:0!important;padding-bottom:1rem;max-width:100%!important}
+.block-container{
+  padding-top:0!important;padding-bottom:0!important;
+  padding-left:0!important;padding-right:0!important;
+  max-width:100%!important;margin-top:0!important;
+}
+/* Remove qualquer espaço residual do Streamlit */
+.stApp{margin-top:0!important}
+div[data-testid="stVerticalBlock"]{gap:0!important}
+div[data-testid="stVerticalBlockBorderWrapper"]{padding:0!important}
 section[data-testid="stSidebar"]{display:none!important}
 /* Upload centralizado */
-.upload-outer{display:flex;justify-content:center;align-items:center;min-height:96vh;width:100%;padding:12px}
+.upload-outer{
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;width:100%;padding:16px;
+  margin-top:-4rem;  /* compensa padding do Streamlit */
+}
 
 /* Header */
 .db-header{background:linear-gradient(135deg,#1F4E79,#2E75B6);border-radius:12px;
@@ -522,9 +534,24 @@ def render_dashboard(lista):
 # TELA DE UPLOAD
 # ══════════════════════════════════════════════════════════════════════════════
 def render_upload():
-    st.markdown('<div class="upload-outer"><div class="upload-card">', unsafe_allow_html=True)
-
+    # CSS extra para centralizar verticalmente na tela
     st.markdown("""
+    <style>
+    /* Centraliza verticalmente o card de upload */
+    section.main > div.block-container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 100vh !important;
+        padding: 0 !important;
+    }
+    .upload-card {
+        width: 100%;
+        max-width: 680px;
+        margin: auto;
+    }
+    </style>
+    <div class="upload-card">
     <div class="upload-header">
       <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
         <div class="db-logo">SKF</div>
@@ -588,7 +615,7 @@ def render_upload():
             """, unsafe_allow_html=True)
 
         st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
     st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF </div>',
                 unsafe_allow_html=True)
 
@@ -633,39 +660,76 @@ def render_resultados():
                 del st.session_state["processado"]
                 st.rerun()
         with col_b:
-            st.markdown("""
-            <button onclick="
-                var el = document.documentElement;
-                if(el.requestFullscreen) el.requestFullscreen();
-                else if(el.webkitRequestFullscreen) el.webkitRequestFullscreen();
-                else if(el.mozRequestFullScreen) el.mozRequestFullScreen();
-                else if(el.msRequestFullscreen) el.msRequestFullscreen();
-                setTimeout(function(){
-                    var hdr = document.querySelector('header[data-testid=stHeader]');
-                    var tbar = document.querySelector('[data-testid=stToolbar]');
-                    var menu = document.getElementById('MainMenu');
-                    if(hdr) hdr.style.display='none';
-                    if(tbar) tbar.style.display='none';
-                    if(menu) menu.style.display='none';
-                    document.querySelector('.block-container').style.paddingTop='0';
-                }, 400);
-            " style="width:100%;background:linear-gradient(135deg,#1F4E79,#2E75B6);
-                color:white;border:none;border-radius:8px;padding:8px 12px;
-                font-family:Barlow,sans-serif;font-size:13px;font-weight:600;
-                cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;
-                height:38px;transition:all .2s"
-                onmouseover="this.style.opacity='0.85'"
-                onmouseout="this.style.opacity='1'">
-              ⛶ &nbsp;Apresentar
-            </button>
+            import streamlit.components.v1 as components
+            components.html("""
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <style>
+            * { margin:0; padding:0; box-sizing:border-box; }
+            body { background:transparent; }
+            button {
+                width:100%; height:38px;
+                background:linear-gradient(135deg,#1F4E79,#2E75B6);
+                color:white; border:none; border-radius:8px;
+                font-family:Barlow,sans-serif; font-size:13px; font-weight:600;
+                cursor:pointer; display:flex; align-items:center; justify-content:center;
+                gap:6px; transition:all .2s; letter-spacing:.3px;
+            }
+            button:hover { opacity:.85; transform:translateY(-1px); }
+            </style>
+            </head>
+            <body>
+            <button onclick="apresentar()">⛶ &nbsp;Apresentar</button>
             <script>
-            document.addEventListener('fullscreenchange', function(){
-                if(!document.fullscreenElement){
-                    // Ao sair do fullscreen, mantém aparência
+            function apresentar() {
+                // Pega o elemento raiz da página PAI (parent frame)
+                var parentDoc = window.parent.document;
+                var el = parentDoc.documentElement;
+
+                // Fullscreen na página pai
+                if (el.requestFullscreen) {
+                    el.requestFullscreen();
+                } else if (el.webkitRequestFullscreen) {
+                    el.webkitRequestFullscreen();
+                } else if (el.mozRequestFullScreen) {
+                    el.mozRequestFullScreen();
+                } else if (el.msRequestFullscreen) {
+                    el.msRequestFullscreen();
+                }
+
+                // Esconde elementos do Streamlit na página pai
+                setTimeout(function() {
+                    var selectors = [
+                        'header[data-testid="stHeader"]',
+                        '[data-testid="stToolbar"]',
+                        '#MainMenu',
+                        '[data-testid="stDecoration"]',
+                        '[data-testid="stStatusWidget"]'
+                    ];
+                    selectors.forEach(function(sel) {
+                        var el = parentDoc.querySelector(sel);
+                        if (el) el.style.display = 'none';
+                    });
+                    // Remove padding do container
+                    var bc = parentDoc.querySelector('.block-container');
+                    if (bc) {
+                        bc.style.paddingTop = '0';
+                        bc.style.paddingBottom = '0';
+                    }
+                }, 600);
+            }
+
+            // Ao pressionar ESC ou sair do fullscreen, restaura
+            window.parent.document.addEventListener('fullscreenchange', function() {
+                if (!window.parent.document.fullscreenElement) {
+                    // saiu do fullscreen — pode restaurar elementos se quiser
                 }
             });
             </script>
-            """, unsafe_allow_html=True)
+            </body>
+            </html>
+            """, height=42)
 
     st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
