@@ -329,7 +329,7 @@ def render_dashboard(lista):
     meses_disp = ["Todos"] + [meses_map[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     with col1:
-        setor_sel = st.selectbox("🏭  SETOR (Cod2)", setores)
+        setor_sel = st.selectbox("🏭  SETOR", setores)
     with col2:
         ano_sel = st.selectbox("📅  ANO", anos)
     with col3:
@@ -534,91 +534,137 @@ def render_dashboard(lista):
 # TELA DE UPLOAD
 # ══════════════════════════════════════════════════════════════════════════════
 def render_upload():
-    # CSS extra para centralizar verticalmente na tela
     st.markdown("""
     <style>
-    /* Centraliza verticalmente o card de upload */
-    section.main > div.block-container {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        min-height: 100vh !important;
+    /* Força centralização vertical perfeita */
+    section.main > div.block-container,
+    section.main > div.block-container > div,
+    section.main > div.block-container > div > div {
         padding: 0 !important;
+        margin: 0 !important;
     }
-    .upload-card {
+    .upload-wrapper {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: linear-gradient(135deg, #0D2137 0%, #1A3A5C 100%);
+        z-index: 1;
+    }
+    .upload-inner {
         width: 100%;
-        max-width: 680px;
-        margin: auto;
+        max-width: 580px;
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 24px 80px rgba(0,0,0,0.5);
     }
+    .upload-head {
+        background: linear-gradient(135deg, #1F4E79, #2E75B6);
+        padding: 28px 32px;
+    }
+    .upload-head-row {
+        display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+    }
+    .upload-logo {
+        width: 48px; height: 48px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 15px; font-weight: 700; color: white;
+        border: 1px solid rgba(255,255,255,0.25);
+        flex-shrink: 0;
+        font-family: "Barlow Condensed", sans-serif;
+    }
+    .upload-title {
+        font-family: "Barlow Condensed", sans-serif;
+        font-size: 22px; font-weight: 700;
+        color: white; letter-spacing: .5px; line-height: 1.1;
+    }
+    .upload-sub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+    .upload-desc { font-size: 13px; color: rgba(255,255,255,0.82); line-height: 1.6; }
+    .upload-body { padding: 28px 32px; }
+    .upload-steps {
+        background: #F0F6FF; border: 1px solid #C8DCEF;
+        border-radius: 10px; padding: 16px 20px;
+        font-size: 13px; color: #1F4E79; line-height: 2;
+    }
+    .upload-footer {
+        text-align: center; font-size: 10px;
+        color: rgba(255,255,255,0.3); margin-top: 16px; letter-spacing: .3px;
+    }
+    /* Esconde decoração do Streamlit */
+    [data-testid="stDecoration"] { display: none !important; }
     </style>
-    <div class="upload-card">
-    <div class="upload-header">
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px">
-        <div class="db-logo">SKF</div>
-        <div>
-          <div class="db-title" style="font-size:20px">Extrator de Laudos SKF</div>
-          <div class="db-sub"> Gerdau Charqueadas · Eng. de Manutenção</div>
+
+    <div class="upload-wrapper">
+      <div class="upload-inner">
+        <div class="upload-head">
+          <div class="upload-head-row">
+            <div class="upload-logo">SKF</div>
+            <div>
+              <div class="upload-title">Extrator de Laudos SKF</div>
+              <div class="upload-sub"> Gerdau Charqueadas · Eng. de Manutenção</div>
+            </div>
+          </div>
+          <div class="upload-desc">
+            Faça o upload do ZIP com os laudos em PDF.<br>
+            Gera o <strong>Excel consolidado</strong> e o <strong>painel interativo</strong> automaticamente.
+          </div>
+        </div>
+        <div class="upload-body">
+    """, unsafe_allow_html=True)
+
+    uploaded = st.file_uploader(
+        "📦 Selecione o arquivo ZIP com os laudos",
+        type=["zip"],
+        help="Arquivo .zip enviado pelo laboratório SKF com os PDFs dos laudos"
+    )
+
+    if uploaded:
+        st.success(f"✅ **{uploaded.name}** selecionado — {uploaded.size/1024/1024:.1f} MB")
+        if st.button("⚙️ Processar Laudos", type="primary", use_container_width=True):
+            with st.spinner("Processando laudos..."):
+                zf = zipfile.ZipFile(BytesIO(uploaded.read()))
+                pdfs = [(n, zf.read(n)) for n in zf.namelist()
+                        if n.lower().endswith(".pdf") and not n.startswith("__MACOSX")]
+            if not pdfs:
+                st.error("Nenhum PDF encontrado no ZIP.")
+                return
+            progress = st.progress(0)
+            lista, erros = [], []
+            for i,(nome,pdf_bytes) in enumerate(sorted(pdfs),1):
+                progress.progress(i/len(pdfs),
+                    text=f"Processando {i}/{len(pdfs)}: {os.path.basename(nome)[:45]}")
+                try:
+                    lista.append(extrair_laudo(os.path.basename(nome), pdf_bytes))
+                except Exception as e:
+                    erros.append(str(e))
+            progress.progress(1.0, text="Concluído!")
+            st.session_state["laudos"] = lista
+            st.session_state["processado"] = True
+            st.session_state["nome_excel"] = f"LAUDOS_{datetime.now().strftime('%d-%m-%Y')}.xlsx"
+            st.rerun()
+    else:
+        st.markdown("""
+        <div class="upload-steps">
+          📦 &nbsp;<strong>1.</strong> Receba o ZIP do laboratório SKF<br>
+          ⬆️ &nbsp;<strong>2.</strong> Selecione o arquivo acima<br>
+          ⚙️ &nbsp;<strong>3.</strong> Clique em <strong>Processar Laudos</strong><br>
+          📊 &nbsp;<strong>4.</strong> Veja o painel e baixe o Excel
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("""
         </div>
       </div>
-      <div style="font-size:13px;color:rgba(255,255,255,0.78);line-height:1.6">
-        Faça o upload do ZIP com os laudos em PDF.<br>
-        Gera Excel consolidado <b>e</b> painel interativo automaticamente.
+      <div class="upload-footer">
+        Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF
       </div>
     </div>
     """, unsafe_allow_html=True)
-
-    with st.container():
-        st.markdown('<div class="upload-body">', unsafe_allow_html=True)
-        uploaded = st.file_uploader("📦 Selecione o arquivo ZIP com os laudos",
-                                     type=["zip"],
-                                     help="Arquivo .zip enviado pelo laboratório SKF")
-
-        if uploaded:
-            st.success(f"✅ **{uploaded.name}** — {uploaded.size/1024/1024:.1f} MB")
-
-            if st.button("⚙️ Processar Laudos", type="primary", use_container_width=True):
-                with st.spinner("Processando laudos..."):
-                    zf = zipfile.ZipFile(BytesIO(uploaded.read()))
-                    pdfs = [(n, zf.read(n)) for n in zf.namelist()
-                            if n.lower().endswith(".pdf") and not n.startswith("__MACOSX")]
-
-                if not pdfs:
-                    st.error("Nenhum PDF encontrado no ZIP.")
-                    return
-
-                progress = st.progress(0)
-                lista, erros = [], []
-                for i,(nome,pdf_bytes) in enumerate(sorted(pdfs),1):
-                    progress.progress(i/len(pdfs), text=f"Processando {i}/{len(pdfs)}: {os.path.basename(nome)[:45]}")
-                    try:
-                        lista.append(extrair_laudo(os.path.basename(nome), pdf_bytes))
-                    except Exception as e:
-                        erros.append(str(e))
-
-                progress.progress(1.0, text="Concluído!")
-
-                # Salva na sessão
-                st.session_state["laudos"] = lista
-                st.session_state["processado"] = True
-                st.session_state["nome_excel"] = f"LAUDOS_{datetime.now().strftime('%d-%m-%Y')}.xlsx"
-                st.rerun()
-
-        else:
-            st.markdown("""
-            <div style="background:rgba(31,78,121,0.15);border:1px solid rgba(46,117,182,0.2);
-                        border-radius:10px;padding:20px;font-size:13px;color:rgba(0,0,0,0.65);line-height:1.8">
-              📦 &nbsp;<b>1.</b> Receba o ZIP do laboratório<br>
-              ⬆️ &nbsp;<b>2.</b> Faça o upload acima<br>
-              ⚙️ &nbsp;<b>3.</b> Clique em Processar Laudos<br>
-              📊 &nbsp;<b>4.</b> Veja o painel interativo e baixe o Excel
-            </div>
-            """, unsafe_allow_html=True)
-
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div class="footer-note">Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF </div>',
-                unsafe_allow_html=True)
-
 # ══════════════════════════════════════════════════════════════════════════════
 # TELA DE RESULTADOS (após processar)
 # ══════════════════════════════════════════════════════════════════════════════
