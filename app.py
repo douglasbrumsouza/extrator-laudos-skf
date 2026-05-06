@@ -48,7 +48,9 @@ section[data-testid="stSidebar"] { display: none !important; }
     margin-top: 0 !important;
 }
 .stApp { background: linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%) !important; }
-div[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
+
+/* Reduz o espaçamento geral entre blocos nativos do Streamlit */
+div[data-testid="stVerticalBlock"] { gap: 0.5rem !important; }
 
 /* ── UPLOAD SCREEN ── */
 .up-wrap {
@@ -90,7 +92,6 @@ div[data-testid="stVerticalBlock"] { gap: 0.35rem !important; }
     color: rgba(255,255,255,0.3); margin-top: 14px; letter-spacing: .4px;
 }
 
-/* ── CORREÇÃO DE ALINHAMENTO DA TELA DE UPLOAD ── */
 div[data-testid="stFileUploader"],
 div[data-testid="stSpinner"],
 div[data-testid="stAlert"],
@@ -145,7 +146,8 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 
 /* ── KPI CARDS ── */
 .kpi { border-radius: 10px; padding: 13px 14px; text-align: center;
-       border: 1px solid transparent; position: relative; overflow: hidden; }
+       border: 1px solid transparent; position: relative; overflow: hidden; 
+       height: 100%; /* Força a mesma altura */ }
 .kpi::before { content:''; position:absolute; top:0; left:0; right:0;
                height:3px; border-radius:10px 10px 0 0; }
 .kpi-tot { background:#162E4A; border-color:#2A4A6A; }
@@ -168,10 +170,11 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── SECTION CARDS E GRÁFICOS ── */
+/* ── SECTION CARDS ── */
 .sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px;
       padding:12px 14px; }
 
+/* ── CAIXAS DOS GRÁFICOS (União do Título com o Gráfico) ── */
 .sc-top {
     background:#112035; border:1px solid #1A3A5C; border-bottom:none;
     border-radius:10px 10px 0 0; padding:12px 14px 4px 14px;
@@ -182,8 +185,12 @@ div[data-testid="stPlotlyChart"] {
     border-top: none;
     border-radius: 0 0 10px 10px;
     padding: 0 10px 10px 10px;
-    /* Puxa agressivamente o gráfico nativo para colar no título e fundir as caixas */
-    margin-top: -15px !important; 
+}
+
+/* O segredo para colar o título no gráfico sem quebrar nada:
+   Anula APENAS a margem do bloco que contém o título (.sc-top) */
+div.element-container:has(.sc-top) {
+    margin-bottom: -0.5rem !important; 
 }
 
 .st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
@@ -213,15 +220,14 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.15); color:#F59E0B; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(76,175,80,.15);  color:#4CAF50; border:1px solid rgba(76,175,80,.3); }
 
-/* ── EXTERMINADOR DE ESPAÇAMENTOS (GAPS) ── */
-/* 1. Anula a sobra gigante abaixo dos filtros */
+/* ── SELECTBOX LABELS (Reduz a sobra embaixo dos filtros) ── */
 div[data-testid="stSelectbox"] {
-    margin-bottom: -22px !important; 
+    margin-bottom: -10px !important;
 }
 div[data-testid="stSelectbox"] label {
     color:#BDD7EE !important; font-size:10px !important;
     text-transform:uppercase; letter-spacing:.8px;
-    margin-bottom: 4px !important;
+    margin-bottom: 2px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -608,12 +614,12 @@ def render_dashboard(lista):
     pa = f"{alt/total*100:.0f}%"  if total else "0%"
     pm = f"{alm/total*100:.0f}%"  if total else "0%"
 
-    # ── KPIs (Malha 2:1:1 - Com flexbox horizontal e margens verticais coladas) ──
+    # ── KPIs (Malha 2:1:1 - Garantindo as colunas perfeitamente fechadas) ──────
     kc1, kc2, kc3 = st.columns([2, 1, 1])
     
     with kc1:
         st.markdown(f"""
-        <div style="display:flex; gap:1rem; width:100%; margin-top:-10px; margin-bottom:-8px;">
+        <div style="display:flex; gap:1rem; width:100%; height:100%;">
           <div class="kpi-tot kpi" style="flex:1;">
             <div class="kv">{total}</div>
             <div class="kl">TOTAL DE ATIVOS</div>
@@ -628,7 +634,7 @@ def render_dashboard(lista):
 
     with kc2:
         st.markdown(f"""
-        <div class="kpi-alt kpi" style="width:100%; margin-top:-10px; margin-bottom:-8px;">
+        <div class="kpi-alt kpi" style="width:100%;">
           <div class="kv">{alt}</div>
           <div class="kl">ALERTA</div>
           <div class="ks">{pa} da frota</div>
@@ -636,14 +642,11 @@ def render_dashboard(lista):
 
     with kc3:
         st.markdown(f"""
-        <div class="kpi-alm kpi" style="width:100%; margin-top:-10px; margin-bottom:-8px;">
+        <div class="kpi-alm kpi" style="width:100%;">
           <div class="kv">{alm}</div>
           <div class="kl">ALARME</div>
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
-
-    # Note que a "st.markdown(<div style='height:4px'>)" que havia aqui no seu código original foi deletada, 
-    # pois ela adicionava um buraco enorme por padrão do Streamlit.
 
     # ── GRÁFICOS (Malha 2:1:1) ─────────────────────────────────────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
@@ -653,8 +656,7 @@ def render_dashboard(lista):
                   margin=dict(l=0,r=0,t=4,b=30))
 
     with gc1:
-        # A sc-top também recebeu margem negativa para puxar os gráficos para cima colados no KPI
-        st.markdown('<div class="sc-top" style="margin-top:-6px;"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-top"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
@@ -673,7 +675,7 @@ def render_dashboard(lista):
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
 
     with gc2:
-        st.markdown('<div class="sc-top" style="margin-top:-6px;"><div class="st">Distribuição</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-top"><div class="st">Distribuição</div></div>', unsafe_allow_html=True)
         if not dff.empty and total > 0:
             dp = dff["Status"].value_counts().reset_index()
             dp.columns = ["Status","n"]
@@ -693,7 +695,7 @@ def render_dashboard(lista):
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
 
     with gc3:
-        st.markdown('<div class="sc-top" style="margin-top:-6px;"><div class="st">Coletas por Mês</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-top"><div class="st">Coletas por Mês</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             dm = dff.groupby("Mês coleta").size().reset_index(name="n").sort_values("Mês coleta")
             dm["label"] = dm["Mês coleta"].map(lambda x: MESES.get(int(x),"") if pd.notna(x) else "")
