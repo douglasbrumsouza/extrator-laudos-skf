@@ -130,9 +130,9 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 
 /* ── CORREÇÃO DE ALINHAMENTO DA ACTION BAR ── */
 .act-bar {
-    background: #0D2137; border: 1px solid #1A3A5C; border-radius: 8px; /* Combinando com raio dos botões */
+    background: #0D2137; border: 1px solid #1A3A5C; border-radius: 8px;
     padding: 0 16px; display: flex; align-items: center; gap: 10px;
-    height: 42px; margin-bottom: 0px; margin-top: 2px; /* Altura exata para alinhar com st.button */
+    height: 42px; margin-bottom: 0px; margin-top: 2px;
 }
 .act-title {
     font-family: 'Barlow Condensed',sans-serif; font-size: 15px;
@@ -168,11 +168,11 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── SECTION CARDS (Tabela preservada) ── */
+/* ── SECTION CARDS ── */
 .sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px;
       padding:12px 14px; }
 
-/* ── CORREÇÃO DAS CAIXAS DOS GRÁFICOS (Unindo Título + Plotly nativo) ── */
+/* ── CORREÇÃO DAS CAIXAS DOS GRÁFICOS ── */
 .sc-top {
     background:#112035; border:1px solid #1A3A5C; border-bottom:none;
     border-radius:10px 10px 0 0; padding:12px 14px 4px 14px;
@@ -183,7 +183,7 @@ div[data-testid="stPlotlyChart"] {
     border-top: none;
     border-radius: 0 0 10px 10px;
     padding: 0 10px 10px 10px;
-    margin-top: -12px !important; /* Puxa o gráfico para colar na caixa de título */
+    margin-top: -12px !important;
 }
 
 .st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
@@ -213,10 +213,11 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.15); color:#F59E0B; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(76,175,80,.15);  color:#4CAF50; border:1px solid rgba(76,175,80,.3); }
 
-/* ── Selectbox ── */
+/* ── Selectbox Labels ── */
 div[data-testid="stSelectbox"] label {
-    color:#BDD7EE !important; font-size:9px !important;
+    color:#BDD7EE !important; font-size:10px !important;
     text-transform:uppercase; letter-spacing:.8px;
+    margin-bottom: 4px !important; /* Afasta um pouco do input para ficar mais alinhado */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -456,7 +457,7 @@ def render_upload():
     </html>
     """, height=440)
 
-    # Widgets Streamlit — Renderizados na raiz (o CSS cuidará de centralizar e travar em 540px)
+    # Widgets Streamlit — Renderizados na raiz
     uploaded = st.file_uploader(
         "📦 Selecione o arquivo ZIP com os laudos",
         type=["zip"],
@@ -531,7 +532,7 @@ def render_dashboard(lista):
         * { margin:0; padding:0; box-sizing:border-box; }
         body { background:transparent; font-family:'Barlow',sans-serif; }
         button {
-            width:100%; height:40px; /* Corrigido para encaixe perfeito */
+            width:100%; height:40px; 
             background: linear-gradient(135deg,#1F4E79,#2E75B6);
             color:white; border:none; border-radius:8px;
             font-size:13px; font-weight:600; cursor:pointer;
@@ -566,17 +567,14 @@ def render_dashboard(lista):
                         var el = doc.querySelector(s);
                         if (el) el.style.cssText = 'display:none!important';
                     });
-                    // Zera padding do container
                     var bc = doc.querySelector('.block-container');
                     if (bc) { bc.style.paddingTop='0.3rem'; bc.style.paddingBottom='0'; }
                 }
-                hide();
-                setTimeout(hide, 500);
-                setTimeout(hide, 1200);
+                hide(); setTimeout(hide, 500); setTimeout(hide, 1200);
             } catch(e) { console.log('Fullscreen error:', e); }
         }
         </script>
-        """, height=42) # Ajustado height para 42 alinhando com a barra de ação
+        """, height=42)
 
     # ── Header do dashboard ────────────────────────────────────────────────────
     ultima = df["Data de coleta"].dropna().iloc[-1] if not df["Data de coleta"].dropna().empty else "—"
@@ -598,11 +596,10 @@ def render_dashboard(lista):
       </div>
     </div>""", unsafe_allow_html=True)
 
-    # ── Filtros ────────────────────────────────────────────────────────────────
+    # ── Filtros (Malha 2:1:1) ──────────────────────────────────────────────────
     setores = ["Todos"] + sorted(df["Cod2"].dropna().unique().tolist())
     anos    = ["Todos"] + sorted(df["Ano coleta"].dropna().astype(int).unique().tolist(), reverse=True)
-    meses_disp = ["Todos"] + [MESES_F[m] for m in
-                  sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
+    meses_disp = ["Todos"] + [MESES_F[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     fc1, fc2, fc3 = st.columns([2, 1, 1])
     with fc1: setor_sel = st.selectbox("🏭  SETOR (Cod2)", setores, label_visibility="visible")
@@ -624,34 +621,51 @@ def render_dashboard(lista):
     pa = f"{alt/total*100:.0f}%"  if total else "0%"
     pm = f"{alm/total*100:.0f}%"  if total else "0%"
 
-    # ── KPIs ──────────────────────────────────────────────────────────────────
-    k1, k2, k3, k4 = st.columns(4)
-    kpis = [
-        (k1,"kpi-tot kpi",total,"TOTAL DE ATIVOS","laudos no período"),
-        (k2,"kpi-nor kpi",norm,"NORMAL",f"{pn} da frota"),
-        (k3,"kpi-alt kpi",alt,"ALERTA",f"{pa} da frota"),
-        (k4,"kpi-alm kpi",alm,"ALARME",f"{pm} da frota"),
-    ]
-    for col, cls, val, lbl, sub in kpis:
-        with col:
-            st.markdown(f"""
-            <div class="{cls}">
-              <div class="kv">{val}</div>
-              <div class="kl">{lbl}</div>
-              <div class="ks">{sub}</div>
-            </div>""", unsafe_allow_html=True)
+    # ── KPIs (Malha 2:1:1 para Alinhamento Perfeito) ───────────────────────────
+    kc1, kc2, kc3 = st.columns([2, 1, 1])
+    
+    with kc1:
+        # Coloca o Total e o Normal dividindo o mesmo espaço (equivalente à coluna 2)
+        st.markdown(f"""
+        <div style="display:flex; gap:1rem; width:100%;">
+          <div class="kpi-tot kpi" style="flex:1;">
+            <div class="kv">{total}</div>
+            <div class="kl">TOTAL DE ATIVOS</div>
+            <div class="ks">laudos no período</div>
+          </div>
+          <div class="kpi-nor kpi" style="flex:1;">
+            <div class="kv">{norm}</div>
+            <div class="kl">NORMAL</div>
+            <div class="ks">{pn} da frota</div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    with kc2:
+        st.markdown(f"""
+        <div class="kpi-alt kpi" style="width:100%;">
+          <div class="kv">{alt}</div>
+          <div class="kl">ALERTA</div>
+          <div class="ks">{pa} da frota</div>
+        </div>""", unsafe_allow_html=True)
+
+    with kc3:
+        st.markdown(f"""
+        <div class="kpi-alm kpi" style="width:100%;">
+          <div class="kv">{alm}</div>
+          <div class="kl">ALARME</div>
+          <div class="ks">{pm} da frota</div>
+        </div>""", unsafe_allow_html=True)
 
     st.markdown("<div style='height:4px'></div>", unsafe_allow_html=True)
 
-    # ── Gráficos ───────────────────────────────────────────────────────────────
-    g1, g2, g3 = st.columns([3, 1.2, 1.2])
+    # ── Gráficos (Malha 2:1:1 para Alinhamento Perfeito) ───────────────────────
+    gc1, gc2, gc3 = st.columns([2, 1, 1])
     COR = {"Normal":"#639922","Alerta":"#BA7517","Alarme":"#E24B4A"}
     LAYOUT = dict(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
                   font=dict(color="#8AAABB",family="Barlow"),
                   margin=dict(l=0,r=0,t=4,b=30))
 
-    with g1:
-        # FECHANDO a tag da caixa superior Imediatamente para evitar quebra do DOM
+    with gc1:
         st.markdown('<div class="sc-top"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
@@ -670,7 +684,7 @@ def render_dashboard(lista):
                 bargap=0.3)
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
 
-    with g2:
+    with gc2:
         st.markdown('<div class="sc-top"><div class="st">Distribuição</div></div>', unsafe_allow_html=True)
         if not dff.empty and total > 0:
             dp = dff["Status"].value_counts().reset_index()
@@ -690,7 +704,7 @@ def render_dashboard(lista):
                             bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
 
-    with g3:
+    with gc3:
         st.markdown('<div class="sc-top"><div class="st">Coletas por Mês</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             dm = dff.groupby("Mês coleta").size().reset_index(name="n").sort_values("Mês coleta")
@@ -706,7 +720,7 @@ def render_dashboard(lista):
                 yaxis=dict(showgrid=False,showticklabels=False))
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
 
-    # ── Tabela (A Tabela estava correta pois encapsula apenas HTML) ─────────────
+    # ── Tabela ─────────────────────────────────────────────────────────────────
     st.markdown('<div class="sc"><div class="st">Equipamentos com Desvio — Ação Necessária</div>', unsafe_allow_html=True)
 
     dtab = dff[dff["Status"].isin(["Alarme","Alerta"])].sort_values("Status")
