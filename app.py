@@ -451,7 +451,7 @@ def render_upload():
           📊 &nbsp;<b>4.</b> Veja o painel e baixe o Excel
         </div>
       </div>
-      <div class="foot">Desenvolvido por Douglas Brum · SKF </div>
+      <div class="foot">Desenvolvido por Douglas Brum · SKF</div>
     </div>
     </body>
     </html>
@@ -655,7 +655,7 @@ def render_dashboard(lista):
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
             db["pct"] = (db["n"] / db["tot"] * 100).round(1)
-            fig = px.bar(db, x="Percentuais", y="Setor", color="Status", orientation="h",
+            fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
                          barmode="stack", color_discrete_map=COR, text="pct",
                          category_orders={"Status":["Normal","Alerta","Alarme"]})
             fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
