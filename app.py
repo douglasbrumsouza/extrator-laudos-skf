@@ -108,8 +108,7 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 /* ── DASHBOARD HEADER E BARRAS ── */
 .db-header {
     background: linear-gradient(135deg,#1F4E79,#2E75B6);
-    border-radius: 10px; padding: 10px 16px; 
-    margin-bottom: 24px !important; /* CORREÇÃO 1: Espaço vital para afastar o cabeçalho das labels de filtro */
+    border-radius: 10px; padding: 10px 16px; margin-bottom: 2px;
     display: flex; align-items: center; justify-content: space-between;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
@@ -172,7 +171,7 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── CAIXAS DOS GRÁFICOS (Fusão Segura Sem Sobreposição) ── */
+/* ── CAIXAS DOS GRÁFICOS E TABELAS ── */
 .sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px; padding:12px 14px; }
 
 .sc-top {
@@ -192,7 +191,6 @@ div[data-testid="stPlotlyChart"] {
 .st::before { content:''; display:inline-block; width:3px; height:12px;
               border-radius:2px; background:#2E75B6; }
 
-/* ── TABELA ── */
 .tbl { width:100%; border-collapse:collapse; font-size:11px; }
 .tbl thead tr { background:#0D2137; }
 .tbl thead th { padding:8px 10px; text-align:left; font-size:9px; font-weight:600;
@@ -214,10 +212,22 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.15); color:#F59E0B; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(76,175,80,.15);  color:#4CAF50; border:1px solid rgba(76,175,80,.3); }
 
-/* ── SELECTBOX LABELS ── */
+/* ── SELECTBOX LABELS (Alinhamento Horizontal Matemático Perfeito) ── */
 div[data-testid="stSelectbox"] label {
-    color:#BDD7EE !important; font-size:11px !important;
-    text-transform:uppercase; letter-spacing:.8px;
+    min-height: 0 !important;
+    margin-bottom: 2px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+div[data-testid="stSelectbox"] label p {
+    color:#BDD7EE !important; 
+    font-size:12px !important;
+    font-weight: 600 !important;
+    text-transform:uppercase; 
+    letter-spacing:1px;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -435,7 +445,7 @@ def render_upload():
           <div class="logo">SKF</div>
           <div>
             <div class="title">Extrator de Laudos SKF</div>
-            <div class="sub"> Gerdau Charqueadas · Eng. de Manutenção</div>
+            <div class="sub">Gerdau Charqueadas · Eng. de Manutenção</div>
           </div>
         </div>
         <div class="desc">
@@ -588,8 +598,8 @@ def render_dashboard(lista):
 
     fc1, fc2, fc3 = st.columns([2, 1, 1])
     with fc1: setor_sel = st.selectbox("🏭  SETOR", setores, label_visibility="visible")
-    with fc2: ano_sel   = st.selectbox("📅  ANO",          anos,    label_visibility="visible")
-    with fc3: mes_sel   = st.selectbox("📆  MÊS",          meses_disp, label_visibility="visible")
+    with fc2: ano_sel   = st.selectbox("📅  ANO",   anos,    label_visibility="visible")
+    with fc3: mes_sel   = st.selectbox("📆  MÊS",   meses_disp, label_visibility="visible")
 
     dff = df.copy()
     if setor_sel != "Todos": dff = dff[dff["Cod2"] == setor_sel]
@@ -640,8 +650,8 @@ def render_dashboard(lista):
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── ESPAÇADOR VITAL (Garante o espaço exato marcado no oval vermelho) ───────────
-    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
+    # ── ESPAÇADOR VITAL (Garante o espaço entre KPIs e Gráficos) ───────────
+    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
 
     # ── GRÁFICOS (Malha 2:1:1) Com Arquitetura Segura Plotly ───────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
@@ -652,18 +662,19 @@ def render_dashboard(lista):
     with gc1:
         st.markdown('<div class="sc-top"><div class="st">Status por Setor</div></div>', unsafe_allow_html=True)
         if not dff.empty:
-            db = dff.groupby(["cod2","Status"]).size().reset_index(name="n")
+            db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
             db["pct"] = (db["n"] / db["tot"] * 100).round(1)
-            fig = px.bar(db, x="pct", y="Setor", color="Status", orientation="h",
+            fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
                          barmode="stack", color_discrete_map=COR, text="pct",
-                         category_orders={"Status":["Normal","Alerta","Alarme"]})
+                         category_orders={"Status":["Normal","Alerta","Alarme"]},
+                         labels={"Cod2": "Setor"})
             fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
                               insidetextanchor="middle", textfont_size=10, textfont_color="white", cliponaxis=False)
             fig.update_layout(**LAYOUT, height=220,
-                margin=dict(l=10, r=20, t=20, b=30), # t=20 alinha com as outras perfeitamente
-                xaxis=dict(showgrid=False,showticklabels=False,range=[0, 115]),
-                yaxis=dict(showgrid=False,tickfont=dict(color="white",size=12,family="Barlow Condensed")),
+                margin=dict(l=10, r=30, t=10, b=30), # r=30 evita o corte no "100%" à direita
+                xaxis=dict(showgrid=False,showticklabels=False,range=[0, 120]),
+                yaxis=dict(title=None, showgrid=False,tickfont=dict(color="white",size=12,family="Barlow Condensed")),
                 legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center",font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"),
                 bargap=0.3)
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
@@ -682,7 +693,7 @@ def render_dashboard(lista):
             fig2.add_annotation(text=f"<b>{total}</b>", x=0.5, y=0.5,
                 font=dict(size=24,color="white",family="Barlow Condensed"), showarrow=False)
             fig2.update_layout(**LAYOUT, height=220,
-                margin=dict(l=10, r=10, t=35, b=50), # CORREÇÃO 2: t=35 impede que o topo da pizza seja cortado
+                margin=dict(l=10, r=10, t=10, b=50), 
                 showlegend=True,
                 legend=dict(orientation="h",y=-0.3,x=0.5,xanchor="center", font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
@@ -704,7 +715,7 @@ def render_dashboard(lista):
             fig3.update_layout(**LAYOUT, height=220,
                 margin=dict(l=10, r=10, t=25, b=30),
                 xaxis=dict(showgrid=False,tickfont=dict(color="#8AAABB",size=10)),
-                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.3]))
+                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.4]))
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
 
     # ── TABELA ─────────────────────────────────────────────────────────────────
