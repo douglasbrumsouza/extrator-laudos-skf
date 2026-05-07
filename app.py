@@ -1,4 +1,7 @@
 import streamlit as st
+# --- LOGO DA EMPRESA EM BASE64 ---
+# Cole TODO aquele conteúdo que você copiou entre as aspas triplas abaixo:
+LOGO_SKF = """data:image/webp;base64,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"""
 import streamlit.components.v1 as components
 import zipfile, re, os, base64
 from io import BytesIO
@@ -407,12 +410,11 @@ def render_upload():
     }
     .logo-row { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
     .logo {
-        width:46px; height:46px; border-radius:11px;
-        background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.25);
-        display:flex; align-items:center; justify-content:center;
-        font-family:'Barlow Condensed',sans-serif; font-size:15px;
-        font-weight:700; color:white;
-    }
+    width: 46px; 
+    height: 46px; 
+    object-fit: contain; /* Garante que a imagem não distorça */
+    flex-shrink: 0;
+}
     .title { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; color:white; }
     .sub { font-size:11px; color:rgba(255,255,255,0.6); margin-top:2px; }
     .desc { font-size:13px; color:rgba(255,255,255,0.82); line-height:1.6; }
@@ -432,7 +434,7 @@ def render_upload():
     <div class="card">
       <div class="head">
         <div class="logo-row">
-          <div class="logo">SKF</div>
+          <img src="{LOGO_SKF}" class="logo">
           <div>
             <div class="title">Extrator de Laudos SKF</div>
             <div class="sub">Gerdau Charqueadas · Eng. de Manutenção</div>
