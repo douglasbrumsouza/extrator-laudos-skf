@@ -2,7 +2,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 import zipfile, re, os, base64
 from io import BytesIO
-from datetime import datetime
+from datetime import datetime, timedelta
 
 try:
     import pdfplumber
@@ -575,7 +575,7 @@ def render_dashboard(lista):
       <div style="text-align:right">
         <div class="db-badge">● AO VIVO</div>
         <div style="font-size:10px;color:#BDD7EE;margin-top:3px">
-          Última coleta: {ultima} &nbsp;|&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')}
+          Última coleta: {ultima} &nbsp;|&nbsp; {agora_br.strftime('%d/%m/%Y %H:%M')}
         </div>
         <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
       </div>
