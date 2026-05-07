@@ -109,7 +109,7 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .db-header {
     background: linear-gradient(135deg,#1F4E79,#2E75B6);
     border-radius: 10px; padding: 10px 16px; 
-    margin-bottom: 25px !important; /* CORREÇÃO 1: Espaço vital abaixo do cabeçalho para as labels respirarem */
+    margin-bottom: 24px !important; /* CORREÇÃO 1: Espaço vital para afastar o cabeçalho das labels de filtro */
     display: flex; align-items: center; justify-content: space-between;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
@@ -177,14 +177,13 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 
 .sc-top {
     background:#112035; border:1px solid #1A3A5C; border-bottom:none;
-    border-radius:10px 10px 0 0; padding:12px 14px 20px 14px; 
-    margin-top: 15px !important; /* CORREÇÃO 2: Força espaço limpo ACIMA dos cartões de gráfico */
+    border-radius:10px 10px 0 0; padding:12px 14px 20px 14px;
     position: relative; z-index: 1;
 }
 div[data-testid="stPlotlyChart"] {
     background: #112035; border: 1px solid #1A3A5C; border-top: none;
     border-radius: 0 0 10px 10px; padding: 0 10px 10px 10px;
-    margin-top: -24px !important; /* Desliza o frame suavemente para cima do padding sem quebrar */
+    margin-top: -24px !important;
     position: relative; z-index: 10;
 }
 
@@ -219,7 +218,6 @@ div[data-testid="stPlotlyChart"] {
 div[data-testid="stSelectbox"] label {
     color:#BDD7EE !important; font-size:11px !important;
     text-transform:uppercase; letter-spacing:.8px;
-    margin-bottom: 6px !important; /* CORREÇÃO 3: Espaço entre o Título (SETOR) e a caixa branca */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -589,7 +587,7 @@ def render_dashboard(lista):
     meses_disp = ["Todos"] + [MESES_F[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     fc1, fc2, fc3 = st.columns([2, 1, 1])
-    with fc1: setor_sel = st.selectbox("🏭  SETOR (Cod2)", setores, label_visibility="visible")
+    with fc1: setor_sel = st.selectbox("🏭  SETOR (COD2)", setores, label_visibility="visible")
     with fc2: ano_sel   = st.selectbox("📅  ANO",          anos,    label_visibility="visible")
     with fc3: mes_sel   = st.selectbox("📆  MÊS",          meses_disp, label_visibility="visible")
 
@@ -642,8 +640,8 @@ def render_dashboard(lista):
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── ESPAÇADOR VITAL (Criando o espaço exato exigido na marcação vermelha) ──
-    st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+    # ── ESPAÇADOR VITAL (Garante o espaço exato marcado no oval vermelho) ───────────
+    st.markdown("<div style='height: 2rem;'></div>", unsafe_allow_html=True)
 
     # ── GRÁFICOS (Malha 2:1:1) Com Arquitetura Segura Plotly ───────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
@@ -660,12 +658,10 @@ def render_dashboard(lista):
             fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
                          barmode="stack", color_discrete_map=COR, text="pct",
                          category_orders={"Status":["Normal","Alerta","Alarme"]})
-            # O cliponaxis=False salva o 100% de ser cortado
             fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
                               insidetextanchor="middle", textfont_size=10, textfont_color="white", cliponaxis=False)
-            # Aumentamos o X range para 115 dando uma margem grande na direita
             fig.update_layout(**LAYOUT, height=220,
-                margin=dict(l=10, r=20, t=10, b=30),
+                margin=dict(l=10, r=20, t=20, b=30), # t=20 alinha com as outras perfeitamente
                 xaxis=dict(showgrid=False,showticklabels=False,range=[0, 115]),
                 yaxis=dict(showgrid=False,tickfont=dict(color="white",size=12,family="Barlow Condensed")),
                 legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center",font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"),
@@ -685,9 +681,8 @@ def render_dashboard(lista):
             ))
             fig2.add_annotation(text=f"<b>{total}</b>", x=0.5, y=0.5,
                 font=dict(size=24,color="white",family="Barlow Condensed"), showarrow=False)
-            # b=50 garante espaço para a legenda ficar em baixo SEM tocar na pizza
             fig2.update_layout(**LAYOUT, height=220,
-                margin=dict(l=10, r=10, t=10, b=50), 
+                margin=dict(l=10, r=10, t=35, b=50), # CORREÇÃO 2: t=35 impede que o topo da pizza seja cortado
                 showlegend=True,
                 legend=dict(orientation="h",y=-0.3,x=0.5,xanchor="center", font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
@@ -705,12 +700,11 @@ def render_dashboard(lista):
                 textfont=dict(color="#8AAABB",size=10),
                 hovertemplate="%{x}: %{y} laudos<extra></extra>"
             ))
-            # cliponaxis=False garante que os números soltos não sejam devorados pelo teto
             fig3.update_traces(cliponaxis=False)
             fig3.update_layout(**LAYOUT, height=220,
-                margin=dict(l=10, r=10, t=20, b=30),
+                margin=dict(l=10, r=10, t=25, b=30),
                 xaxis=dict(showgrid=False,tickfont=dict(color="#8AAABB",size=10)),
-                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.3])) # Folga de 30% pra cima
+                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.3]))
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
 
     # ── TABELA ─────────────────────────────────────────────────────────────────
