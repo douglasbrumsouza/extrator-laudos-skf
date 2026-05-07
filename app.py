@@ -35,7 +35,7 @@ st.set_page_config(
 # ── CSS global ────────────────────────────────────────────────────────────────
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700&display=swap');
 
 /* Reset Streamlit */
 html, body, [class*="css"] { font-family: 'Barlow', sans-serif !important; }
@@ -52,8 +52,9 @@ section[data-testid="stSidebar"] { display: none !important; }
     max-width: 100% !important;
     margin-top: 0 !important;
 }
-/* Fundo Enterprise Profissional (Ardósia/Chumbo Profundo) */
-.stApp { background: #0B111A !important; }
+
+/* ── TEMA CLEAN CORPORATE (Fundo Claro) ── */
+.stApp { background: #F0F4F8 !important; } /* Fundo Gelo/Cinza super claro */
 
 /* Gap vertical padrão mais controlado e seguro */
 div[data-testid="stVerticalBlock"] { gap: 0.6rem !important; }
@@ -63,39 +64,39 @@ div[data-testid="stVerticalBlock"] { gap: 0.6rem !important; }
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     display: flex; align-items: center; justify-content: center;
     padding: 20px; z-index: 999;
-    background: #0B111A;
+    background: #F0F4F8;
 }
 .up-card {
     width: 100%; max-width: 560px;
     background: #FFFFFF; border-radius: 4px; overflow: hidden;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 1px solid #E2E8F0;
 }
 .up-head {
-    background: #004990; /* Azul Corporativo Oficial SKF */
+    background: #0055A5; /* Azul SKF */
     padding: 26px 30px;
 }
 .up-logo-row { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
 .up-logo {
     width: 46px; height: 46px; border-radius: 4px;
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,1); 
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed',sans-serif; font-size: 14px;
-    font-weight: 700; color: white; flex-shrink: 0;
+    flex-shrink: 0; padding: 4px;
 }
 .up-title {
     font-family: 'Barlow Condensed',sans-serif;
     font-size: 21px; font-weight: 700; color: white; line-height: 1.1;
 }
-.up-sub { font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+.up-sub { font-size: 11px; color: rgba(255,255,255,0.8); margin-top: 2px; }
 .up-desc { font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.6; }
 .up-body { padding: 24px 30px; }
 .up-steps {
-    background: #F4F7F9; border: 1px solid #E5E9ED; border-radius: 4px;
-    padding: 14px 18px; font-size: 13px; color: #2A323C; line-height: 2.1;
+    background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 4px;
+    padding: 14px 18px; font-size: 13px; color: #334155; line-height: 2.1;
 }
 .up-footer {
     text-align: center; font-size: 10px;
-    color: rgba(255,255,255,0.3); margin-top: 14px; letter-spacing: .4px;
+    color: #94A3B8; margin-top: 14px; letter-spacing: .4px;
 }
 
 div[data-testid="stFileUploader"],
@@ -111,108 +112,109 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 
 /* ── DASHBOARD HEADER E BARRAS ── */
 .db-header {
-    background: #004990; /* Azul SKF Puro */
+    background: #0055A5; /* Azul SKF */
     border-radius: 4px; padding: 10px 16px; 
     margin-bottom: 24px !important; 
     display: flex; align-items: center; justify-content: space-between;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .db-logo {
     width: 36px; height: 36px; border-radius: 4px;
-    background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
+    background: #FFFFFF; 
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed',sans-serif; font-size: 12px;
-    font-weight: 700; color: white; flex-shrink: 0;
+    flex-shrink: 0; padding: 2px;
 }
 .db-title {
     font-family: 'Barlow Condensed',sans-serif;
     font-size: 18px; font-weight: 700; color: white; letter-spacing: .5px;
 }
-.db-sub { font-size: 10px; color: rgba(255,255,255,0.7); margin-top: 1px; }
+.db-sub { font-size: 10px; color: rgba(255,255,255,0.8); margin-top: 1px; }
 .db-badge {
-    font-size: 9px; font-weight: 600; color: #FFFFFF;
-    background: rgba(255,255,255,0.2); padding: 2px 10px;
-    border-radius: 2px; border: 1px solid rgba(255,255,255,0.3);
+    font-size: 9px; font-weight: 600; color: #0055A5;
+    background: #FFFFFF; padding: 2px 10px;
+    border-radius: 2px;
 }
-.db-credit { font-size: 8px; color: rgba(255,255,255,0.3); margin-top: 3px; text-align:right; }
+.db-credit { font-size: 8px; color: rgba(255,255,255,0.6); margin-top: 3px; text-align:right; }
 
 .act-bar {
-    background: #151F2E; border: 1px solid #243447; border-radius: 4px;
+    background: #FFFFFF; border: 1px solid #E2E8F0; border-radius: 4px;
     padding: 0 16px; display: flex; align-items: center; gap: 10px;
-    height: 42px;
+    height: 42px; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 .act-title {
     font-family: 'Barlow Condensed',sans-serif; font-size: 14px;
-    font-weight: 700; color: white; flex: 1;
+    font-weight: 700; color: #0F172A; flex: 1;
 }
 .bcnt {
     font-size: 10px; font-weight: 700; padding: 2px 8px;
     border-radius: 2px; white-space: nowrap;
 }
 
-/* ── KPI CARDS (Flat Industrial) ── */
+/* ── KPI CARDS (Light Corporate) ── */
 .kpi { border-radius: 4px; padding: 16px 10px; text-align: center;
-       background: #151F2E !important; border: 1px solid #243447 !important; 
-       position: relative; overflow: hidden; height: 100%; box-sizing: border-box; }
-.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:4px 4px 0 0; }
-.kpi-tot::before { background:#004990; }
-.kpi-nor::before { background:#059669; }
-.kpi-alt::before { background:#D97706; }
-.kpi-alm::before { background:#DC2626; }
+       background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; 
+       position: relative; overflow: hidden; height: 100%; box-sizing: border-box; 
+       box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.kpi::before { content:''; position:absolute; top:0; left:0; bottom:0; width:4px; }
+.kpi-tot::before { background:#0055A5; }
+.kpi-nor::before { background:#10B981; }
+.kpi-alt::before { background:#F59E0B; }
+.kpi-alm::before { background:#EF4444; }
 
 .kv { font-family:'Barlow Condensed',sans-serif; font-size:32px; font-weight:700; line-height:1; }
-.kpi-tot .kv { color:#FFFFFF; }
+.kpi-tot .kv { color:#0055A5; }
 .kpi-nor .kv { color:#10B981; }
 .kpi-alt .kv { color:#F59E0B; }
 .kpi-alm .kv { color:#EF4444; }
-.kl { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:6px; color:#8B9BB4 !important; }
-.ks { font-size:10px; margin-top:2px; color:#5D6B82 !important; }
+.kl { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:6px; color:#475569 !important; }
+.ks { font-size:10px; margin-top:2px; color:#64748B !important; }
 
 /* ── CAIXAS DOS GRÁFICOS (Clean UI) ── */
-.sc { background:#151F2E; border:1px solid #243447; border-radius:4px; padding:12px 14px; }
+.sc { background:#FFFFFF; border:1px solid #E2E8F0; border-radius:4px; padding:12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
 
 .sc-top {
-    background:#151F2E; border:1px solid #243447; border-bottom:none;
+    background:#FFFFFF; border:1px solid #E2E8F0; border-bottom:none;
     border-radius:4px 4px 0 0; padding:12px 14px 20px 14px;
     position: relative; z-index: 1;
 }
 div[data-testid="stPlotlyChart"] {
-    background: #151F2E; border: 1px solid #243447; border-top: none;
+    background: #FFFFFF; border: 1px solid #E2E8F0; border-top: none;
     border-radius: 0 0 4px 4px; padding: 0 10px 10px 10px;
     margin-top: -24px !important;
     position: relative; z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02);
 }
 
-.st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
-      color:#E2E8F0; display:flex; align-items:center; gap:6px; margin-bottom:8px; }
+.st { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+      color:#0F172A; display:flex; align-items:center; gap:6px; margin-bottom:8px; }
 .st::before { content:''; display:inline-block; width:3px; height:12px;
-              border-radius:2px; background:#004990; }
+              border-radius:2px; background:#0055A5; }
 
 /* ── TABELA (Corporate Grid) ── */
 .tbl { width:100%; border-collapse:collapse; font-size:11px; }
-.tbl thead tr { background:#0F1722; }
-.tbl thead th { padding:8px 10px; text-align:left; font-size:9px; font-weight:600;
-                text-transform:uppercase; letter-spacing:.7px; color:#8B9BB4;
-                border-bottom:2px solid #243447; }
-.tbl tbody tr { border-bottom:1px solid #1C2838; }
-.tbl tbody tr:hover { background:#1A2636; }
-.tbl tbody td { padding:8px 10px; color:#B0BACC; }
-.td-eq { color:white !important; font-weight:500 !important; }
-.td-set { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:#60A5FA !important; }
-.td-par { color:#D97706 !important; }
-.td-obs { font-size:10px; color:#8B9BB4 !important; font-style:italic; }
-.td-data { font-size:10px; color:#5D6B82 !important; }
-.td-red { color:#EF4444 !important; font-weight:600 !important; }
-.td-yel { color:#F59E0B !important; font-weight:600 !important; }
+.tbl thead tr { background:#F8FAFC; }
+.tbl thead th { padding:8px 10px; text-align:left; font-size:9px; font-weight:700;
+                text-transform:uppercase; letter-spacing:.7px; color:#475569;
+                border-bottom:2px solid #E2E8F0; }
+.tbl tbody tr { border-bottom:1px solid #E2E8F0; }
+.tbl tbody tr:hover { background:#F1F5F9; }
+.tbl tbody td { padding:8px 10px; color:#334155; }
+.td-eq { color:#0F172A !important; font-weight:600 !important; }
+.td-set { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; color:#0055A5 !important; }
+.td-par { color:#D97706 !important; font-weight:500; }
+.td-obs { font-size:10px; color:#64748B !important; font-style:italic; }
+.td-data { font-size:10px; color:#64748B !important; }
+.td-red { color:#EF4444 !important; font-weight:700 !important; }
+.td-yel { color:#F59E0B !important; font-weight:700 !important; }
 .badge { display:inline-block; font-size:9px; font-weight:700; padding:2px 8px;
          border-radius:2px; text-transform:uppercase; letter-spacing:.4px; }
-.ba { background:rgba(220,38,38,.1); color:#EF4444; border:1px solid rgba(220,38,38,.3); }
-.bl { background:rgba(217,119,6,.1); color:#F59E0B; border:1px solid rgba(217,119,6,.3); }
-.bn { background:rgba(5,150,105,.1); color:#10B981; border:1px solid rgba(5,150,105,.3); }
+.ba { background:rgba(239,68,68,.1); color:#EF4444; border:1px solid rgba(239,68,68,.3); }
+.bl { background:rgba(245,158,11,.1); color:#D97706; border:1px solid rgba(245,158,11,.3); }
+.bn { background:rgba(16,185,129,.1); color:#10B981; border:1px solid rgba(16,185,129,.3); }
 
 /* ── SELECTBOX LABELS ── */
 div[data-testid="stSelectbox"] label {
-    color:#8B9BB4 !important; font-size:11px !important;
+    color:#475569 !important; font-size:11px !important; font-weight:600 !important;
     text-transform:uppercase; letter-spacing:.8px;
 }
 </style>
@@ -342,7 +344,7 @@ def gerar_excel(lista):
     wb = openpyxl.Workbook(); ws = wb.active; ws.title = "Laudos"
     colunas = list(lista[0].keys())
     cor_st = {"Normal": "C6EFCE", "Alerta": "FFEB9C", "Alarme": "FFC7CE"}
-    hf = PatternFill("solid", start_color="004990") # Cor Azul Oficial SKF para o Excel
+    hf = PatternFill("solid", start_color="0055A5") # Cor Azul Oficial SKF para o Excel
     hfont = Font(bold=True, color="FFFFFF", name="Arial", size=9)
     borda = Border(left=Side(style="thin"), right=Side(style="thin"),
                    top=Side(style="thin"), bottom=Side(style="thin"))
@@ -353,7 +355,7 @@ def gerar_excel(lista):
     ws.row_dimensions[1].height = 36
     for ri, linha in enumerate(lista, 2):
         st_val = linha.get("Status", "Normal")
-        fb = PatternFill("solid", start_color="F4F7F9" if ri % 2 == 0 else "FFFFFF")
+        fb = PatternFill("solid", start_color="F8FAFC" if ri % 2 == 0 else "FFFFFF")
         for ci, col in enumerate(colunas, 1):
             c = ws.cell(row=ri, column=ci, value=linha.get(col))
             c.font = Font(name="Arial", size=9); c.border = borda
@@ -388,36 +390,36 @@ def render_upload():
     * {{ margin:0; padding:0; box-sizing:border-box; }}
     body {{
         font-family: 'Barlow', sans-serif;
-        background: #0B111A;
+        background: #F0F4F8;
         min-height: 100vh; display: flex;
         align-items: center; justify-content: center; padding: 20px;
     }}
     .card {{
         width: 100%; max-width: 540px;
         background: #FFFFFF; border-radius: 4px; overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08); border: 1px solid #E2E8F0;
     }}
     .head {{
-        background: #004990;
+        background: #0055A5;
         padding: 26px 30px;
     }}
     .logo-row {{ display:flex; align-items:center; gap:14px; margin-bottom:12px; }}
     .logo {{
         width:46px; height:46px; border-radius:4px;
-        background:transparent; border:none; padding:0;
+        background:rgba(255,255,255,1); border:none; padding:4px;
         display:flex; align-items:center; justify-content:center;
     }}
     .title {{ font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; color:white; }}
-    .sub {{ font-size:11px; color:rgba(255,255,255,0.7); margin-top:2px; }}
+    .sub {{ font-size:11px; color:rgba(255,255,255,0.8); margin-top:2px; }}
     .desc {{ font-size:13px; color:rgba(255,255,255,0.9); line-height:1.6; }}
     .body {{ padding: 24px 30px; }}
     .steps {{
-        background:#F4F7F9; border:1px solid #E5E9ED; border-radius:4px;
-        padding:14px 18px; font-size:13px; color:#2A323C; line-height:2.2;
+        background:#F8FAFC; border:1px solid #E2E8F0; border-radius:4px;
+        padding:14px 18px; font-size:13px; color:#334155; line-height:2.2;
     }}
-    .steps b {{ color:#0F1722; }}
+    .steps b {{ color:#0F172A; }}
     .foot {{
-        text-align:center; font-size:10px; color:rgba(255,255,255,0.3);
+        text-align:center; font-size:10px; color:#94A3B8;
         padding-bottom:20px; letter-spacing:.4px;
     }}
     </style>
@@ -427,7 +429,7 @@ def render_upload():
       <div class="head">
         <div class="logo-row">
           <div class="logo">
-            <img src="{LOGO_B64}" style="width:100%; height:100%; border-radius:4px; object-fit:cover;">
+            <img src="{LOGO_B64}" style="width:100%; height:100%; border-radius:2px; object-fit:contain;">
           </div>
           <div>
             <div class="title">Extrator de Laudos SKF</div>
@@ -481,7 +483,7 @@ def render_upload():
             st.rerun()
     else:
         st.markdown("""
-        <p style="text-align:center;color:#5D6B82;font-size:12px;margin-top:4px;width:100%;max-width:540px;margin-left:auto;margin-right:auto;">
+        <p style="text-align:center;color:#64748B;font-size:12px;margin-top:4px;width:100%;max-width:540px;margin-left:auto;margin-right:auto;">
         Arraste o arquivo ZIP aqui ou clique para selecionar
         </p>""", unsafe_allow_html=True)
 
@@ -508,9 +510,9 @@ def render_dashboard(lista):
         st.markdown(f"""
         <div class="act-bar">
           <span class="act-title">{total_g} laudos processados</span>
-          <span class="bcnt" style="background:rgba(5,150,105,.1);color:#10B981;border:1px solid rgba(5,150,105,.3)">{norm_g} Normal</span>
-          <span class="bcnt" style="background:rgba(217,119,6,.1);color:#F59E0B;border:1px solid rgba(217,119,6,.3)">{alt_g} Alerta</span>
-          <span class="bcnt" style="background:rgba(220,38,38,.1);color:#EF4444;border:1px solid rgba(220,38,38,.3)">{alm_g} Alarme</span>
+          <span class="bcnt" style="background:rgba(16,185,129,.1);color:#10B981;border:1px solid rgba(16,185,129,.3)">{norm_g} Normal</span>
+          <span class="bcnt" style="background:rgba(245,158,11,.1);color:#D97706;border:1px solid rgba(245,158,11,.3)">{alt_g} Alerta</span>
+          <span class="bcnt" style="background:rgba(239,68,68,.1);color:#EF4444;border:1px solid rgba(239,68,68,.3)">{alm_g} Alarme</span>
         </div>""", unsafe_allow_html=True)
     with c2:
         st.download_button("⬇️  Baixar Excel", data=excel_bytes,
@@ -529,13 +531,13 @@ def render_dashboard(lista):
         body {{ background:transparent; font-family:'Barlow',sans-serif; }}
         button {{
             width:100%; height:42px; 
-            background: #004990;
-            color:white; border:none; border-radius:4px;
-            font-size:13px; font-weight:600; cursor:pointer;
+            background: #FFFFFF;
+            color:#0055A5; border:1px solid #CBD5E1; border-radius:4px;
+            font-size:13px; font-weight:700; cursor:pointer;
             display:flex; align-items:center; justify-content:center; gap:6px;
             transition:all .2s; letter-spacing:.3px;
         }}
-        button:hover {{ background: #003870; }}
+        button:hover {{ background: #F8FAFC; border-color:#0055A5; }}
         </style>
         <button onclick="entrarTelaCheia()">⛶ &nbsp;Apresentar</button>
         <script>
@@ -545,10 +547,10 @@ def render_dashboard(lista):
                 var doc = window.parent.document;
                 var dbLogo = doc.querySelector('.db-logo');
                 if (dbLogo && !dbLogo.querySelector('img')) {{
-                    dbLogo.innerHTML = '<img src="' + LOGO_B64 + '" style="width:100%; height:100%; border-radius:4px; object-fit:cover;">';
-                    dbLogo.style.background = 'transparent';
+                    dbLogo.innerHTML = '<img src="' + LOGO_B64 + '" style="width:100%; height:100%; border-radius:2px; object-fit:contain;">';
+                    dbLogo.style.background = '#FFFFFF';
                     dbLogo.style.border = 'none';
-                    dbLogo.style.padding = '0';
+                    dbLogo.style.padding = '4px';
                 }}
             }} catch(e) {{}}
         }}
@@ -578,7 +580,7 @@ def render_dashboard(lista):
     st.markdown(f"""
     <div class="db-header">
       <div style="display:flex;align-items:center;gap:12px">
-        <div class="db-logo" style="padding:0; border:none; background:transparent; width:36px; height:36px;"></div>
+        <div class="db-logo" style="width:36px; height:36px;"></div>
         <div>
           <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
           <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção </div>
@@ -586,7 +588,7 @@ def render_dashboard(lista):
       </div>
       <div style="text-align:right">
         <div class="db-badge">● AO VIVO</div>
-        <div style="font-size:10px;color:#F4F7F9;margin-top:3px">
+        <div style="font-size:10px;color:#FFFFFF;opacity:0.8;margin-top:3px">
           Última coleta: {ultima} &nbsp;|&nbsp; {(datetime.utcnow() - timedelta(hours=3)).strftime('%d/%m/%Y %H:%M')}
         </div>
         <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
@@ -656,9 +658,9 @@ def render_dashboard(lista):
 
     # ── GRÁFICOS (Malha 2:1:1) ─────────────────────────────────────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
-    COR = {"Normal":"#059669","Alerta":"#D97706","Alarme":"#DC2626"}
+    COR = {"Normal":"#10B981","Alerta":"#F59E0B","Alarme":"#EF4444"}
     LAYOUT = dict(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-                  font=dict(color="#8B9BB4",family="Barlow"))
+                  font=dict(color="#475569",family="Barlow"))
 
     with gc1:
         st.markdown('<div class="sc-top"><div class="st">Status por Setor</div></div>', unsafe_allow_html=True)
@@ -674,8 +676,8 @@ def render_dashboard(lista):
             fig.update_layout(**LAYOUT, height=220,
                 margin=dict(l=10, r=20, t=20, b=30),
                 xaxis=dict(showgrid=False,showticklabels=False,range=[0, 115]),
-                yaxis=dict(showgrid=False,tickfont=dict(color="#E2E8F0",size=12,family="Barlow Condensed")),
-                legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center",font=dict(color="#8B9BB4",size=10), bgcolor="rgba(0,0,0,0)"),
+                yaxis=dict(showgrid=False,tickfont=dict(color="#0F172A",size=12,family="Barlow Condensed")),
+                legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center",font=dict(color="#475569",size=10), bgcolor="rgba(0,0,0,0)"),
                 bargap=0.3)
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
 
@@ -686,16 +688,16 @@ def render_dashboard(lista):
             dp.columns = ["Status","n"]
             fig2 = go.Figure(go.Pie(
                 labels=dp["Status"], values=dp["n"], hole=0.55,
-                marker_colors=[COR.get(s,"#5D6B82") for s in dp["Status"]],
+                marker_colors=[COR.get(s,"#94A3B8") for s in dp["Status"]],
                 textinfo="percent", textfont_size=11, textfont_color="white",
                 hovertemplate="%{label}: %{value}<extra></extra>"
             ))
             fig2.add_annotation(text=f"<b>{total}</b>", x=0.5, y=0.5,
-                font=dict(size=24,color="#E2E8F0",family="Barlow Condensed"), showarrow=False)
+                font=dict(size=24,color="#0F172A",family="Barlow Condensed"), showarrow=False)
             fig2.update_layout(**LAYOUT, height=220,
                 margin=dict(l=10, r=10, t=35, b=50),
                 showlegend=True,
-                legend=dict(orientation="h",y=-0.3,x=0.5,xanchor="center", font=dict(color="#8B9BB4",size=10), bgcolor="rgba(0,0,0,0)"))
+                legend=dict(orientation="h",y=-0.3,x=0.5,xanchor="center", font=dict(color="#475569",size=10), bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
 
     with gc3:
@@ -706,15 +708,15 @@ def render_dashboard(lista):
             max_y = dm["n"].max() if not dm.empty else 10
             
             fig3 = go.Figure(go.Bar(
-                x=dm["label"], y=dm["n"], marker_color="#004990", # Azul SKF
+                x=dm["label"], y=dm["n"], marker_color="#0055A5", # Azul SKF
                 text=dm["n"], textposition="outside",
-                textfont=dict(color="#8B9BB4",size=10),
+                textfont=dict(color="#475569",size=10),
                 hovertemplate="%{x}: %{y} laudos<extra></extra>"
             ))
             fig3.update_traces(cliponaxis=False)
             fig3.update_layout(**LAYOUT, height=220,
                 margin=dict(l=10, r=10, t=25, b=30),
-                xaxis=dict(showgrid=False,tickfont=dict(color="#8B9BB4",size=10)),
+                xaxis=dict(showgrid=False,tickfont=dict(color="#64748B",size=10)),
                 yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.3]))
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
 
@@ -723,7 +725,7 @@ def render_dashboard(lista):
 
     dtab = dff[dff["Status"].isin(["Alarme","Alerta"])].sort_values("Status")
     if dtab.empty:
-        st.markdown('<p style="color:#059669;text-align:center;padding:16px">✅ Nenhum equipamento com desvio no período.</p>', unsafe_allow_html=True)
+        st.markdown('<p style="color:#10B981;text-align:center;padding:16px;font-weight:600;">✅ Nenhum equipamento com desvio no período.</p>', unsafe_allow_html=True)
     else:
         rows = ""
         for _, r in dtab.iterrows():
@@ -737,7 +739,7 @@ def render_dashboard(lista):
             vc = "td-yel" if visc else ""
             rows += f"""<tr>
               <td class="td-set">{r.get('Cod2','')}</td>
-              <td style="color:#8B9BB4;font-size:11px">{r.get('Cod3','')}</td>
+              <td style="color:#64748B;font-size:11px">{r.get('Cod3','')}</td>
               <td class="td-eq">{str(r.get('Equipamento Descrição 1','') or '')}</td>
               <td><span class="badge {bcls}">{st_val}</span></td>
               <td class="td-par">{str(r.get('Parâmetros em Alarme','') or '—')}</td>
@@ -759,7 +761,7 @@ def render_dashboard(lista):
 
     # Rodapé
     st.markdown(f"""
-    <div style="text-align:center;margin-top:10px;font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:.4px">
+    <div style="text-align:center;margin-top:10px;font-size:9px;color:#94A3B8;letter-spacing:.4px">
       SKF · Gerdau Charqueadas · Engenharia de Manutenção &nbsp;·&nbsp;
       Desenvolvido por Douglas Brum &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
     </div>""", unsafe_allow_html=True)
