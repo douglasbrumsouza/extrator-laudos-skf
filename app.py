@@ -652,7 +652,7 @@ def render_dashboard(lista):
     with gc1:
         st.markdown('<div class="sc-top"><div class="st">Status por Setor</div></div>', unsafe_allow_html=True)
         if not dff.empty:
-            db = dff.groupby(["Setor","Status"]).size().reset_index(name="n")
+            db = dff.groupby(["cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
             db["pct"] = (db["n"] / db["tot"] * 100).round(1)
             fig = px.bar(db, x="pct", y="Setor", color="Status", orientation="h",
