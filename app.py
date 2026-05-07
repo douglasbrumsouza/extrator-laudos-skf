@@ -43,7 +43,7 @@ html, body, [class*="css"] { font-family: 'Barlow', sans-serif !important; }
 [data-testid="stStatusWidget"] { display: none !important; }
 section[data-testid="stSidebar"] { display: none !important; }
 
-/* Espaçamento do container principal para não cortar as labels no topo */
+/* Espaçamento do container principal */
 .block-container {
     padding: 2.5rem 1.5rem 1rem 1.5rem !important; 
     max-width: 100% !important;
@@ -51,8 +51,8 @@ section[data-testid="stSidebar"] { display: none !important; }
 }
 .stApp { background: linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%) !important; }
 
-/* Layout Limpo: sem margens negativas. Usando o GAP nativo seguro do Streamlit */
-div[data-testid="stVerticalBlock"] { gap: 1rem !important; }
+/* Gap vertical padrão mais controlado e seguro */
+div[data-testid="stVerticalBlock"] { gap: 0.6rem !important; }
 
 /* ── UPLOAD SCREEN ── */
 .up-wrap {
@@ -171,21 +171,27 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── CAIXAS DOS GRÁFICOS (Arquitetura Perfeita e Segura) ── */
+/* ── CAIXAS DOS GRÁFICOS (Fusão Segura Sem Sobreposição) ── */
+.sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px; padding:12px 14px; }
+
+.sc-top {
+    background:#112035; border:1px solid #1A3A5C; border-bottom:none;
+    border-radius:10px 10px 0 0; padding:12px 14px 20px 14px; /* Padding extra para ancorar o gráfico */
+    position: relative; z-index: 1;
+}
 div[data-testid="stPlotlyChart"] {
-    background: #112035; 
-    border: 1px solid #1A3A5C; 
-    border-radius: 10px; 
-    padding: 10px 10px 5px 10px;
+    background: #112035; border: 1px solid #1A3A5C; border-top: none;
+    border-radius: 0 0 10px 10px; padding: 0 10px 10px 10px;
+    margin-top: -24px !important; /* Desliza o frame suavemente para cima do padding (sem quebrar outras divs) */
+    position: relative; z-index: 10;
 }
 
-/* ── TABELA E CONTAINER INFERIOR ── */
-.sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px; padding:16px 14px; }
-.st { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
-      color:#BDD7EE; display:flex; align-items:center; gap:6px; margin-bottom:12px; }
+.st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
+      color:#BDD7EE; display:flex; align-items:center; gap:6px; margin-bottom:8px; }
 .st::before { content:''; display:inline-block; width:3px; height:12px;
               border-radius:2px; background:#2E75B6; }
 
+/* ── TABELA ── */
 .tbl { width:100%; border-collapse:collapse; font-size:11px; }
 .tbl thead tr { background:#0D2137; }
 .tbl thead th { padding:8px 10px; text-align:left; font-size:9px; font-weight:600;
@@ -633,13 +639,17 @@ def render_dashboard(lista):
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── GRÁFICOS (Malha 2:1:1) Com Arquitetura Definitiva Plotly ───────────────
+    # ── ESPAÇADOR VITAL (Evita o cruzamento com as tabelas de baixo) ───────────
+    st.markdown("<div style='height: 0.5rem;'></div>", unsafe_allow_html=True)
+
+    # ── GRÁFICOS (Malha 2:1:1) Com Arquitetura Segura Plotly ───────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
     COR = {"Normal":"#639922","Alerta":"#BA7517","Alarme":"#E24B4A"}
     LAYOUT = dict(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
                   font=dict(color="#8AAABB",family="Barlow"))
 
     with gc1:
+        st.markdown('<div class="sc-top"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
@@ -647,19 +657,20 @@ def render_dashboard(lista):
             fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
                          barmode="stack", color_discrete_map=COR, text="pct",
                          category_orders={"Status":["Normal","Alerta","Alarme"]})
+            # O cliponaxis=False salva o 100% de ser cortado
             fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
                               insidetextanchor="middle", textfont_size=10, textfont_color="white", cliponaxis=False)
-            fig.update_layout(**LAYOUT, height=230,
-                # Título nativo integrado
-                title=dict(text='<b><span style="color:#2E75B6;">|</span> &nbsp;STATUS POR SETOR (COD2)</b>', font=dict(size=11, color="#BDD7EE"), x=0.01, y=0.96),
-                margin=dict(l=10, r=20, t=50, b=30), # t=50 cria espaço limpo para o título
-                xaxis=dict(showgrid=False,showticklabels=False,range=[0, 115]), # 115 impede que o "100%" corte na direita
+            # Aumentamos o X range para 115 dando uma margem grande na direita
+            fig.update_layout(**LAYOUT, height=220,
+                margin=dict(l=10, r=20, t=10, b=30),
+                xaxis=dict(showgrid=False,showticklabels=False,range=[0, 115]),
                 yaxis=dict(showgrid=False,tickfont=dict(color="white",size=12,family="Barlow Condensed")),
-                legend=dict(orientation="h",y=-0.2,x=0,font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"),
+                legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center",font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"),
                 bargap=0.3)
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
 
     with gc2:
+        st.markdown('<div class="sc-top"><div class="st">Distribuição</div></div>', unsafe_allow_html=True)
         if not dff.empty and total > 0:
             dp = dff["Status"].value_counts().reset_index()
             dp.columns = ["Status","n"]
@@ -671,14 +682,15 @@ def render_dashboard(lista):
             ))
             fig2.add_annotation(text=f"<b>{total}</b>", x=0.5, y=0.5,
                 font=dict(size=24,color="white",family="Barlow Condensed"), showarrow=False)
-            fig2.update_layout(**LAYOUT, height=230,
-                title=dict(text='<b><span style="color:#2E75B6;">|</span> &nbsp;DISTRIBUIÇÃO</b>', font=dict(size=11, color="#BDD7EE"), x=0.01, y=0.96),
-                margin=dict(l=10, r=10, t=50, b=50), # b=50 cria espaço inferior para a legenda não sobrepor a pizza
+            # b=50 garante espaço para a legenda ficar em baixo SEM tocar na pizza
+            fig2.update_layout(**LAYOUT, height=220,
+                margin=dict(l=10, r=10, t=10, b=50), 
                 showlegend=True,
-                legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center", font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"))
+                legend=dict(orientation="h",y=-0.3,x=0.5,xanchor="center", font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
 
     with gc3:
+        st.markdown('<div class="sc-top"><div class="st">Coletas por Mês</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             dm = dff.groupby("Mês coleta").size().reset_index(name="n").sort_values("Mês coleta")
             dm["label"] = dm["Mês coleta"].map(lambda x: MESES.get(int(x),"") if pd.notna(x) else "")
@@ -690,19 +702,16 @@ def render_dashboard(lista):
                 textfont=dict(color="#8AAABB",size=10),
                 hovertemplate="%{x}: %{y} laudos<extra></extra>"
             ))
-            fig3.update_traces(cliponaxis=False) # Impede corte do número no topo da barra
-            fig3.update_layout(**LAYOUT, height=230,
-                title=dict(text='<b><span style="color:#2E75B6;">|</span> &nbsp;COLETAS POR MÊS</b>', font=dict(size=11, color="#BDD7EE"), x=0.01, y=0.96),
-                margin=dict(l=10, r=10, t=50, b=30),
+            # cliponaxis=False garante que os números soltos não sejam devorados pelo teto
+            fig3.update_traces(cliponaxis=False)
+            fig3.update_layout(**LAYOUT, height=220,
+                margin=dict(l=10, r=10, t=20, b=30),
                 xaxis=dict(showgrid=False,tickfont=dict(color="#8AAABB",size=10)),
-                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.25])) # 25% de folga no teto
+                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.3])) # Folga de 30% pra cima
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
 
     # ── TABELA ─────────────────────────────────────────────────────────────────
-    st.markdown("""
-    <div class="sc">
-      <div class="st"><span style="color:#2E75B6; font-size:14px; margin-right:4px;">|</span> Equipamentos com Desvio — Ação Necessária</div>
-    """, unsafe_allow_html=True)
+    st.markdown('<div class="sc"><div class="st">Equipamentos com Desvio — Ação Necessária</div>', unsafe_allow_html=True)
 
     dtab = dff[dff["Status"].isin(["Alarme","Alerta"])].sort_values("Status")
     if dtab.empty:
