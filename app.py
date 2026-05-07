@@ -42,16 +42,17 @@ html, body, [class*="css"] { font-family: 'Barlow', sans-serif !important; }
 [data-testid="stDecoration"]{ display: none !important; }
 [data-testid="stStatusWidget"] { display: none !important; }
 section[data-testid="stSidebar"] { display: none !important; }
+
+/* Espaçamento do container principal (Aumentado no topo para não cortar labels) */
 .block-container {
-    padding: 0.6rem 1.2rem 1rem 1.2rem !important;
+    padding: 1.2rem 1.2rem 1rem 1.2rem !important; 
     max-width: 100% !important;
     margin-top: 0 !important;
 }
 .stApp { background: linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%) !important; }
 
-/* ── CONTROLE DE ESPAÇAMENTO VERTICAL GLOBAL E SEGURO ── */
-/* Reduz o gap padrão de todos os blocos nativos para colar os elementos suavemente */
-div[data-testid="stVerticalBlock"] { gap: 0.4rem !important; }
+/* Gap vertical padrão mais controlado e seguro */
+div[data-testid="stVerticalBlock"] { gap: 0.6rem !important; }
 
 /* ── UPLOAD SCREEN ── */
 .up-wrap {
@@ -104,23 +105,23 @@ div.stProgress {
 div[data-testid="stButton"] { display: flex; justify-content: center; }
 div[data-testid="stButton"] > button { max-width: 540px; }
 
-/* ── DASHBOARD ── */
+/* ── DASHBOARD HEADER E BARRAS ── */
 .db-header {
     background: linear-gradient(135deg,#1F4E79,#2E75B6);
-    border-radius: 10px; padding: 13px 20px; margin-bottom: 6px;
+    border-radius: 10px; padding: 10px 16px; margin-bottom: 2px;
     display: flex; align-items: center; justify-content: space-between;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 .db-logo {
-    width: 40px; height: 40px; border-radius: 9px;
+    width: 36px; height: 36px; border-radius: 8px;
     background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2);
     display: flex; align-items: center; justify-content: center;
-    font-family: 'Barlow Condensed',sans-serif; font-size: 13px;
+    font-family: 'Barlow Condensed',sans-serif; font-size: 12px;
     font-weight: 700; color: white; flex-shrink: 0;
 }
 .db-title {
     font-family: 'Barlow Condensed',sans-serif;
-    font-size: 19px; font-weight: 700; color: white; letter-spacing: .5px;
+    font-size: 18px; font-weight: 700; color: white; letter-spacing: .5px;
 }
 .db-sub { font-size: 10px; color: rgba(255,255,255,0.6); margin-top: 1px; }
 .db-badge {
@@ -130,25 +131,24 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 }
 .db-credit { font-size: 8px; color: rgba(255,255,255,0.22); margin-top: 3px; text-align:right; }
 
-/* ── ACTION BAR ── */
 .act-bar {
     background: #0D2137; border: 1px solid #1A3A5C; border-radius: 8px;
-    padding: 8px 16px; display: flex; align-items: center; gap: 10px;
+    padding: 8px 14px; display: flex; align-items: center; gap: 10px;
 }
 .act-title {
-    font-family: 'Barlow Condensed',sans-serif; font-size: 15px;
+    font-family: 'Barlow Condensed',sans-serif; font-size: 14px;
     font-weight: 700; color: white; flex: 1;
 }
 .bcnt {
-    font-size: 10px; font-weight: 700; padding: 2px 9px;
+    font-size: 10px; font-weight: 700; padding: 2px 8px;
     border-radius: 20px; white-space: nowrap;
 }
 
-/* ── KPI CARDS ── */
-.kpi { border-radius: 10px; padding: 13px 14px; text-align: center;
-       border: 1px solid transparent; position: relative; overflow: hidden; }
-.kpi::before { content:''; position:absolute; top:0; left:0; right:0;
-               height:3px; border-radius:10px 10px 0 0; }
+/* ── KPI CARDS (Redimensionados para não sobrepor) ── */
+.kpi { border-radius: 10px; padding: 10px 10px; text-align: center;
+       border: 1px solid transparent; position: relative; overflow: hidden; 
+       height: 100%; box-sizing: border-box; }
+.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:10px 10px 0 0; }
 .kpi-tot { background:#162E4A; border-color:#2A4A6A; }
 .kpi-tot::before { background:#2E75B6; }
 .kpi-nor { background:#0E2B16; border-color:#1A4D22; }
@@ -157,35 +157,32 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-alt::before { background:#F59E0B; }
 .kpi-alm { background:#2B0A0A; border-color:#4A1A1A; }
 .kpi-alm::before { background:#EF4444; }
-.kv { font-family:'Barlow Condensed',sans-serif; font-size:42px; font-weight:700; line-height:1; }
+
+/* Fonte menor e mais segura nos números gigantes */
+.kv { font-family:'Barlow Condensed',sans-serif; font-size:34px; font-weight:700; line-height:1; }
 .kpi-tot .kv { color:white; }
 .kpi-nor .kv { color:#6BCB77; }
 .kpi-alt .kv { color:#F59E0B; }
 .kpi-alm .kv { color:#EF4444; }
-.kl { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; margin-top:3px; }
+.kl { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-top:4px; }
 .kpi-tot .kl { color:#5A7A9A; } .kpi-nor .kl { color:#3A7D44; }
 .kpi-alt .kl { color:#8B6010; } .kpi-alm .kl { color:#8B2020; }
-.ks { font-size:10px; margin-top:1px; }
+.ks { font-size:10px; margin-top:2px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── SECTION CARDS ── */
-.sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px;
-      padding:12px 14px; }
+/* ── CAIXAS DOS GRÁFICOS E TABELAS ── */
+.sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px; padding:12px 14px; }
 
-/* ── CAIXAS DOS GRÁFICOS (União do Título com o Gráfico) ── */
+/* União do título do gráfico e o gráfico em si - Seguro sem quebrar fluxo */
 .sc-top {
     background:#112035; border:1px solid #1A3A5C; border-bottom:none;
-    border-radius:10px 10px 0 0; padding:12px 14px 4px 14px;
+    border-radius:10px 10px 0 0; padding:10px 14px 2px 14px;
 }
 div[data-testid="stPlotlyChart"] {
-    background: #112035;
-    border: 1px solid #1A3A5C;
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-    padding: 0 10px 10px 10px;
-    /* Puxa o gráfico exatamente a medida do stVerticalBlock gap para fundir as caixas */
-    margin-top: -0.4rem !important; 
+    background: #112035; border: 1px solid #1A3A5C; border-top: none;
+    border-radius: 0 0 10px 10px; padding: 0 10px 10px 10px;
+    margin-top: -14px !important; /* Move APENAS o frame do grafico para cima, não a caixa inteira */
 }
 
 .st { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:1px;
@@ -215,11 +212,10 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.15); color:#F59E0B; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(76,175,80,.15);  color:#4CAF50; border:1px solid rgba(76,175,80,.3); }
 
-/* ── SELECTBOX LABELS ── */
+/* ── SELECTBOX LABELS (Sem margens negativas destrutivas) ── */
 div[data-testid="stSelectbox"] label {
-    color:#BDD7EE !important; font-size:10px !important;
+    color:#BDD7EE !important; font-size:11px !important;
     text-transform:uppercase; letter-spacing:.8px;
-    margin-bottom: 2px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -581,7 +577,7 @@ def render_dashboard(lista):
       </div>
     </div>""", unsafe_allow_html=True)
 
-    # ── FILTROS (Malha 2:1:1) ──────────────────────────────────────────────────
+    # ── FILTROS (Malha Nativa 2:1:1) ───────────────────────────────────────────
     setores = ["Todos"] + sorted(df["Cod2"].dropna().unique().tolist())
     anos    = ["Todos"] + sorted(df["Ano coleta"].dropna().astype(int).unique().tolist(), reverse=True)
     meses_disp = ["Todos"] + [MESES_F[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
@@ -606,13 +602,13 @@ def render_dashboard(lista):
     pa = f"{alt/total*100:.0f}%"  if total else "0%"
     pm = f"{alm/total*100:.0f}%"  if total else "0%"
 
-    # ── KPIs (Malha 2:1:1 - Garantindo as colunas perfeitamente alinhadas) ─────
+    # ── KPIs (Malha Nativa 2:1:1) ──────────────────────────────────────────────
     kc1, kc2, kc3 = st.columns([2, 1, 1])
     
     with kc1:
-        # Uso do gap: 1rem garante que a distância entre Total e Normal seja igual a das colunas do Streamlit
+        # AQUI USAMOS O GAP NATIVO (1rem) DENTRO DA COLUNA. SEGURANÇA MÁXIMA.
         st.markdown(f"""
-        <div style="display:flex; gap:1rem;">
+        <div style="display:flex; gap:1rem; width:100%;">
           <div class="kpi-tot kpi" style="flex:1;">
             <div class="kv">{total}</div>
             <div class="kl">TOTAL DE ATIVOS</div>
@@ -627,7 +623,7 @@ def render_dashboard(lista):
 
     with kc2:
         st.markdown(f"""
-        <div class="kpi-alt kpi">
+        <div class="kpi-alt kpi" style="width:100%;">
           <div class="kv">{alt}</div>
           <div class="kl">ALERTA</div>
           <div class="ks">{pa} da frota</div>
@@ -635,13 +631,13 @@ def render_dashboard(lista):
 
     with kc3:
         st.markdown(f"""
-        <div class="kpi-alm kpi">
+        <div class="kpi-alm kpi" style="width:100%;">
           <div class="kv">{alm}</div>
           <div class="kl">ALARME</div>
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── GRÁFICOS (Malha 2:1:1) ─────────────────────────────────────────────────
+    # ── GRÁFICOS (Malha Nativa 2:1:1) ──────────────────────────────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
     COR = {"Normal":"#639922","Alerta":"#BA7517","Alarme":"#E24B4A"}
     LAYOUT = dict(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
