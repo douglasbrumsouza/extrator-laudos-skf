@@ -587,7 +587,7 @@ def render_dashboard(lista):
     meses_disp = ["Todos"] + [MESES_F[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     fc1, fc2, fc3 = st.columns([2, 1, 1])
-    with fc1: setor_sel = st.selectbox("🏭  SETOR (COD2)", setores, label_visibility="visible")
+    with fc1: setor_sel = st.selectbox("🏭  SETOR", setores, label_visibility="visible")
     with fc2: ano_sel   = st.selectbox("📅  ANO",          anos,    label_visibility="visible")
     with fc3: mes_sel   = st.selectbox("📆  MÊS",          meses_disp, label_visibility="visible")
 
@@ -650,7 +650,7 @@ def render_dashboard(lista):
                   font=dict(color="#8AAABB",family="Barlow"))
 
     with gc1:
-        st.markdown('<div class="sc-top"><div class="st">Status por Setor (Cod2)</div></div>', unsafe_allow_html=True)
+        st.markdown('<div class="sc-top"><div class="st">Status por Setor</div></div>', unsafe_allow_html=True)
         if not dff.empty:
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
