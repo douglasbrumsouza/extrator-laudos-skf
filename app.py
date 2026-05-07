@@ -620,7 +620,7 @@ def render_dashboard(lista):
           <div class="kpi-nor kpi" style="flex:1;">
             <div class="kv">{norm}</div>
             <div class="kl">NORMAL</div>
-            <div class="ks">{pn} da frota</div>
+            <div class="ks">{pn} dos laudos</div>
           </div>
         </div>""", unsafe_allow_html=True)
 
