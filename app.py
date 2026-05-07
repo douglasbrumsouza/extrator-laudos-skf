@@ -79,9 +79,9 @@ div[data-testid="stVerticalBlock"] { gap: 0.6rem !important; }
 .up-logo-row { display:flex; align-items:center; gap:14px; margin-bottom:12px; }
 .up-logo {
     width: 46px; height: 46px; border-radius: 4px;
-    background: rgba(255,255,255,1); 
+    background: transparent !important; border: none !important; padding: 0 !important;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; padding: 4px;
+    flex-shrink: 0; 
 }
 .up-title {
     font-family: 'Barlow Condensed',sans-serif;
@@ -119,10 +119,10 @@ div[data-testid="stButton"] > button { max-width: 540px; }
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 .db-logo {
-    width: 36px; height: 36px; border-radius: 4px;
-    background: #FFFFFF; 
+    width: 48px; height: 48px; border-radius: 4px;
+    background: transparent !important; border: none !important; padding: 0 !important;
     display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; padding: 2px;
+    flex-shrink: 0; 
 }
 .db-title {
     font-family: 'Barlow Condensed',sans-serif;
@@ -150,12 +150,13 @@ div[data-testid="stButton"] > button { max-width: 540px; }
     border-radius: 2px; white-space: nowrap;
 }
 
-/* ── KPI CARDS (Light Corporate) ── */
+/* ── KPI CARDS (Light Corporate c/ Borda Esquerda) ── */
 .kpi { border-radius: 4px; padding: 16px 10px; text-align: center;
        background: #FFFFFF !important; border: 1px solid #E2E8F0 !important; 
        position: relative; overflow: hidden; height: 100%; box-sizing: border-box; 
-       box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-.kpi::before { content:''; position:absolute; top:0; left:0; bottom:0; width:4px; }
+       box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+/* Borda da cor indicativa movida para a ESQUERDA como na imagem solicitada */
+.kpi::before { content:''; position:absolute; top:0; left:0; bottom:0; width:6px; height:100%; border-radius: 4px 0 0 4px; }
 .kpi-tot::before { background:#0055A5; }
 .kpi-nor::before { background:#10B981; }
 .kpi-alt::before { background:#F59E0B; }
@@ -212,10 +213,21 @@ div[data-testid="stPlotlyChart"] {
 .bl { background:rgba(245,158,11,.1); color:#D97706; border:1px solid rgba(245,158,11,.3); }
 .bn { background:rgba(16,185,129,.1); color:#10B981; border:1px solid rgba(16,185,129,.3); }
 
-/* ── SELECTBOX LABELS ── */
-div[data-testid="stSelectbox"] label {
-    color:#475569 !important; font-size:11px !important; font-weight:600 !important;
-    text-transform:uppercase; letter-spacing:.8px;
+/* ── SELECTBOX LABELS E DESTAQUE ── */
+div[data-testid="stSelectbox"] label p {
+    color:#475569 !important; font-size:13px !important; font-weight:700 !important;
+    text-transform:uppercase; letter-spacing:0.5px;
+}
+div[data-testid="stSelectbox"] div[data-baseweb="select"] > div {
+    background-color: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 6px !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important;
+    transition: all 0.2s ease;
+}
+div[data-testid="stSelectbox"] div[data-baseweb="select"] > div:hover {
+    border-color: #0055A5 !important;
+    box-shadow: 0 4px 12px rgba(0,85,165,0.1) !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -405,8 +417,8 @@ def render_upload():
     }}
     .logo-row {{ display:flex; align-items:center; gap:14px; margin-bottom:12px; }}
     .logo {{
-        width:46px; height:46px; border-radius:4px;
-        background:rgba(255,255,255,1); border:none; padding:4px;
+        width:48px; height:48px; border-radius:4px;
+        background:transparent; border:none; padding:0;
         display:flex; align-items:center; justify-content:center;
     }}
     .title {{ font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:700; color:white; }}
@@ -429,7 +441,7 @@ def render_upload():
       <div class="head">
         <div class="logo-row">
           <div class="logo">
-            <img src="{LOGO_B64}" style="width:100%; height:100%; border-radius:2px; object-fit:contain;">
+            <img src="{LOGO_B64}" style="width:100%; height:100%; border-radius:4px; object-fit:contain;">
           </div>
           <div>
             <div class="title">Extrator de Laudos SKF</div>
@@ -547,10 +559,10 @@ def render_dashboard(lista):
                 var doc = window.parent.document;
                 var dbLogo = doc.querySelector('.db-logo');
                 if (dbLogo && !dbLogo.querySelector('img')) {{
-                    dbLogo.innerHTML = '<img src="' + LOGO_B64 + '" style="width:100%; height:100%; border-radius:2px; object-fit:contain;">';
-                    dbLogo.style.background = '#FFFFFF';
+                    dbLogo.innerHTML = '<img src="' + LOGO_B64 + '" style="width:100%; height:100%; border-radius:4px; object-fit:contain;">';
+                    dbLogo.style.background = 'transparent';
                     dbLogo.style.border = 'none';
-                    dbLogo.style.padding = '4px';
+                    dbLogo.style.padding = '0';
                 }}
             }} catch(e) {{}}
         }}
@@ -580,7 +592,7 @@ def render_dashboard(lista):
     st.markdown(f"""
     <div class="db-header">
       <div style="display:flex;align-items:center;gap:12px">
-        <div class="db-logo" style="width:36px; height:36px;"></div>
+        <div class="db-logo" style="width:48px; height:48px; background:transparent; padding:0; border:none;"></div>
         <div>
           <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
           <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção </div>
