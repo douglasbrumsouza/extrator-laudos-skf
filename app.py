@@ -629,7 +629,7 @@ def render_dashboard(lista):
         <div class="kpi-alt kpi">
           <div class="kv">{alt}</div>
           <div class="kl">ALERTA</div>
-          <div class="ks">{pa} da frota</div>
+          <div class="ks">{pa} dos laudos</div>
         </div>""", unsafe_allow_html=True)
 
     with kc3:
@@ -637,7 +637,7 @@ def render_dashboard(lista):
         <div class="kpi-alm kpi">
           <div class="kv">{alm}</div>
           <div class="kl">ALARME</div>
-          <div class="ks">{pm} da frota</div>
+          <div class="ks">{pm} dos laudos</div>
         </div>""", unsafe_allow_html=True)
 
     # ── ESPAÇADOR VITAL (Garante o espaço exato marcado no oval vermelho) ───────────
