@@ -51,8 +51,8 @@ section[data-testid="stSidebar"] { display: none !important; }
 }
 .stApp { background: linear-gradient(135deg,#0D2137 0%,#1A3A5C 100%) !important; }
 
-/* Gap vertical padrão mais controlado */
-div[data-testid="stVerticalBlock"] { gap: 0.8rem !important; }
+/* Gap vertical padrão mais controlado e seguro */
+div[data-testid="stVerticalBlock"] { gap: 0.6rem !important; }
 
 /* ── UPLOAD SCREEN ── */
 .up-wrap {
@@ -109,7 +109,7 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .db-header {
     background: linear-gradient(135deg,#1F4E79,#2E75B6);
     border-radius: 10px; padding: 10px 16px; 
-    margin-bottom: 20px; /* Margem vital para desencostar as labels de filtro! */
+    margin-bottom: 25px !important; /* CORREÇÃO 1: Espaço vital abaixo do cabeçalho para as labels respirarem */
     display: flex; align-items: center; justify-content: space-between;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
@@ -172,18 +172,19 @@ div[data-testid="stButton"] > button { max-width: 540px; }
 .kpi-tot .ks { color:#3A5A7A; } .kpi-nor .ks { color:#2A5A30; }
 .kpi-alt .ks { color:#6A4A08; } .kpi-alm .ks { color:#6A1010; }
 
-/* ── CAIXAS DOS GRÁFICOS E TABELAS ── */
+/* ── CAIXAS DOS GRÁFICOS (Fusão Segura Sem Sobreposição) ── */
 .sc { background:#112035; border:1px solid #1A3A5C; border-radius:10px; padding:12px 14px; }
 
-/* Fusão segura entre título HTML e o container do gráfico Plotly */
 .sc-top {
     background:#112035; border:1px solid #1A3A5C; border-bottom:none;
-    border-radius:10px 10px 0 0; padding:12px 14px 2px 14px;
+    border-radius:10px 10px 0 0; padding:12px 14px 20px 14px; 
+    margin-top: 15px !important; /* CORREÇÃO 2: Força espaço limpo ACIMA dos cartões de gráfico */
+    position: relative; z-index: 1;
 }
 div[data-testid="stPlotlyChart"] {
     background: #112035; border: 1px solid #1A3A5C; border-top: none;
     border-radius: 0 0 10px 10px; padding: 0 10px 10px 10px;
-    margin-top: -0.8rem !important; /* Desliza apenas a caixa interna para unir a borda */
+    margin-top: -24px !important; /* Desliza o frame suavemente para cima do padding sem quebrar */
     position: relative; z-index: 10;
 }
 
@@ -218,7 +219,7 @@ div[data-testid="stPlotlyChart"] {
 div[data-testid="stSelectbox"] label {
     color:#BDD7EE !important; font-size:11px !important;
     text-transform:uppercase; letter-spacing:.8px;
-    margin-bottom: 2px !important;
+    margin-bottom: 6px !important; /* CORREÇÃO 3: Espaço entre o Título (SETOR) e a caixa branca */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -607,7 +608,7 @@ def render_dashboard(lista):
     pa = f"{alt/total*100:.0f}%"  if total else "0%"
     pm = f"{alm/total*100:.0f}%"  if total else "0%"
 
-    # ── KPIs (Malha 2:1:1 com Flexbox Nativo e Seguro) ─────────────────────────
+    # ── KPIs (Malha 2:1:1) Divisão perfeita via Flexbox nativo HTML ────────────
     kc1, kc2, kc3 = st.columns([2, 1, 1])
     
     with kc1:
@@ -641,7 +642,10 @@ def render_dashboard(lista):
           <div class="ks">{pm} da frota</div>
         </div>""", unsafe_allow_html=True)
 
-    # ── GRÁFICOS (Malha 2:1:1) Com Títulos Nativos em HTML ─────────────────────
+    # ── ESPAÇADOR VITAL (Criando o espaço exato exigido na marcação vermelha) ──
+    st.markdown("<div style='height: 1.5rem;'></div>", unsafe_allow_html=True)
+
+    # ── GRÁFICOS (Malha 2:1:1) Com Arquitetura Segura Plotly ───────────────────
     gc1, gc2, gc3 = st.columns([2, 1, 1])
     COR = {"Normal":"#639922","Alerta":"#BA7517","Alarme":"#E24B4A"}
     LAYOUT = dict(plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
@@ -656,14 +660,15 @@ def render_dashboard(lista):
             fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
                          barmode="stack", color_discrete_map=COR, text="pct",
                          category_orders={"Status":["Normal","Alerta","Alarme"]})
-            # Impede o corte de número e alinha melhor
+            # O cliponaxis=False salva o 100% de ser cortado
             fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
                               insidetextanchor="middle", textfont_size=10, textfont_color="white", cliponaxis=False)
-            fig.update_layout(**LAYOUT, height=230,
-                margin=dict(l=10, r=30, t=10, b=30), # r=30 cria a folga extra à direita
-                xaxis=dict(showgrid=False,showticklabels=False,range=[0, 120]), # range ampliado para 120 (nada cortado)
+            # Aumentamos o X range para 115 dando uma margem grande na direita
+            fig.update_layout(**LAYOUT, height=220,
+                margin=dict(l=10, r=20, t=10, b=30),
+                xaxis=dict(showgrid=False,showticklabels=False,range=[0, 115]),
                 yaxis=dict(showgrid=False,tickfont=dict(color="white",size=12,family="Barlow Condensed")),
-                legend=dict(orientation="h",y=-0.2,x=0,font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"),
+                legend=dict(orientation="h",y=-0.2,x=0.5,xanchor="center",font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"),
                 bargap=0.3)
             st.plotly_chart(fig, use_container_width=True, config={"displayModeBar":False})
 
@@ -680,8 +685,9 @@ def render_dashboard(lista):
             ))
             fig2.add_annotation(text=f"<b>{total}</b>", x=0.5, y=0.5,
                 font=dict(size=24,color="white",family="Barlow Condensed"), showarrow=False)
-            fig2.update_layout(**LAYOUT, height=230,
-                margin=dict(l=10, r=10, t=20, b=50), # b=50 empurra o limite para a legenda entrar sem bater na pizza
+            # b=50 garante espaço para a legenda ficar em baixo SEM tocar na pizza
+            fig2.update_layout(**LAYOUT, height=220,
+                margin=dict(l=10, r=10, t=10, b=50), 
                 showlegend=True,
                 legend=dict(orientation="h",y=-0.3,x=0.5,xanchor="center", font=dict(color="#8AAABB",size=10), bgcolor="rgba(0,0,0,0)"))
             st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar":False})
@@ -699,11 +705,12 @@ def render_dashboard(lista):
                 textfont=dict(color="#8AAABB",size=10),
                 hovertemplate="%{x}: %{y} laudos<extra></extra>"
             ))
-            fig3.update_traces(cliponaxis=False) # Segurança extra para garantir que texto solto não suma
-            fig3.update_layout(**LAYOUT, height=230,
-                margin=dict(l=10, r=10, t=30, b=30), # t=30 evita bater no teto do frame
+            # cliponaxis=False garante que os números soltos não sejam devorados pelo teto
+            fig3.update_traces(cliponaxis=False)
+            fig3.update_layout(**LAYOUT, height=220,
+                margin=dict(l=10, r=10, t=20, b=30),
                 xaxis=dict(showgrid=False,tickfont=dict(color="#8AAABB",size=10)),
-                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.4])) # Folga elástica de 40%
+                yaxis=dict(showgrid=False,showticklabels=False, range=[0, max_y * 1.3])) # Folga de 30% pra cima
             st.plotly_chart(fig3, use_container_width=True, config={"displayModeBar":False})
 
     # ── TABELA ─────────────────────────────────────────────────────────────────
