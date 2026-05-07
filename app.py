@@ -435,7 +435,7 @@ def render_upload():
           <div class="logo">SKF</div>
           <div>
             <div class="title">Extrator de Laudos SKF</div>
-            <div class="sub">TruVu 360 · Gerdau Charqueadas · Eng. de Manutenção</div>
+            <div class="sub"> Gerdau Charqueadas · Eng. de Manutenção</div>
           </div>
         </div>
         <div class="desc">
@@ -451,7 +451,7 @@ def render_upload():
           📊 &nbsp;<b>4.</b> Veja o painel e baixe o Excel
         </div>
       </div>
-      <div class="foot">Desenvolvido por Douglas Brum · Gerdau Charqueadas · SKF TruVu 360</div>
+      <div class="foot">Desenvolvido por Douglas Brum · SKF </div>
     </div>
     </body>
     </html>
@@ -569,7 +569,7 @@ def render_dashboard(lista):
         <div class="db-logo">SKF</div>
         <div>
           <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
-          <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção · TruVu 360</div>
+          <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção</div>
         </div>
       </div>
       <div style="text-align:right">
@@ -577,7 +577,7 @@ def render_dashboard(lista):
         <div style="font-size:10px;color:#BDD7EE;margin-top:3px">
           Última coleta: {ultima} &nbsp;|&nbsp; {datetime.now().strftime('%d/%m/%Y %H:%M')}
         </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · Gerdau Charqueadas</div>
+        <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
       </div>
     </div>""", unsafe_allow_html=True)
 
@@ -587,7 +587,7 @@ def render_dashboard(lista):
     meses_disp = ["Todos"] + [MESES_F[m] for m in sorted(df["Mês coleta"].dropna().astype(int).unique().tolist())]
 
     fc1, fc2, fc3 = st.columns([2, 1, 1])
-    with fc1: setor_sel = st.selectbox("🏭  SETOR (COD2)", setores, label_visibility="visible")
+    with fc1: setor_sel = st.selectbox("🏭  SETOR", setores, label_visibility="visible")
     with fc2: ano_sel   = st.selectbox("📅  ANO",          anos,    label_visibility="visible")
     with fc3: mes_sel   = st.selectbox("📆  MÊS",          meses_disp, label_visibility="visible")
 
@@ -655,7 +655,7 @@ def render_dashboard(lista):
             db = dff.groupby(["Cod2","Status"]).size().reset_index(name="n")
             db["tot"] = db.groupby("Cod2")["n"].transform("sum")
             db["pct"] = (db["n"] / db["tot"] * 100).round(1)
-            fig = px.bar(db, x="pct", y="Cod2", color="Status", orientation="h",
+            fig = px.bar(db, x="Percentuais", y="Setor", color="Status", orientation="h",
                          barmode="stack", color_discrete_map=COR, text="pct",
                          category_orders={"Status":["Normal","Alerta","Alarme"]})
             fig.update_traces(texttemplate="%{text:.0f}%", textposition="inside",
@@ -749,7 +749,7 @@ def render_dashboard(lista):
     # Rodapé
     st.markdown(f"""
     <div style="text-align:center;margin-top:10px;font-size:9px;color:rgba(255,255,255,0.2);letter-spacing:.4px">
-      SKF TruVu 360 · Gerdau Charqueadas · Engenharia de Manutenção &nbsp;·&nbsp;
+      SKF · Gerdau Charqueadas · Engenharia de Manutenção &nbsp;·&nbsp;
       Desenvolvido por Douglas Brum &nbsp;·&nbsp; {datetime.now().strftime('%d/%m/%Y')}
     </div>""", unsafe_allow_html=True)
 
