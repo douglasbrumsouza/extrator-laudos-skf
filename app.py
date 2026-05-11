@@ -599,9 +599,9 @@ def render_dashboard(lista):
         </div>
       </div>
       <div style="text-align:right">
-        
-     
-          Última coleta: {ultima} &nbsp;|&nbsp; {(datetime.utcnow() - timedelta(hours=3)).strftime('%d/%m/%Y')}
+        <div class="db-badge">● AO VIVO</div>
+        <div style="font-size:10px;color:#FFFFFF;opacity:0.8;margin-top:3px">
+          Última coleta: {ultima} &nbsp;|&nbsp; {(datetime.utcnow() - timedelta(hours=3)).strftime('%d/%m/%Y %H:%M')}
         </div>
         <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
       </div>
