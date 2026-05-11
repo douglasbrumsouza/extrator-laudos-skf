@@ -598,8 +598,6 @@ def render_dashboard(lista):
           <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção </div>
         </div>
       </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
-      </div>
     </div>""", unsafe_allow_html=True)
 
     # ── FILTROS (Malha 2:1:1) ──────────────────────────────────────────────────
