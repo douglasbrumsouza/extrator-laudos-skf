@@ -627,15 +627,7 @@ def render_dashboard(lista):
           <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
           <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção </div>
         </div>
-      </div>
-      <div style="text-align:right">
-        <div class="db-badge">● AO VIVO</div>
-        <div style="font-size:10px;color:#FFFFFF;opacity:0.8;margin-top:3px">
-          Última coleta: {ultima} &nbsp;|&nbsp; {(datetime.utcnow() - timedelta(hours=3)).strftime('%d/%m/%Y %H:%M')}
-        </div>
-        <div class="db-credit">Desenvolvido por Douglas Brum · SKF</div>
-      </div>
-    </div>""", unsafe_allow_html=True)
+     
 
     # ── FILTROS DA TELA ──
     setores = ["Todos"] + sorted([str(x) for x in df["Cod2"].dropna().unique().tolist()])
