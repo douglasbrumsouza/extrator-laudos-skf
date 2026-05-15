@@ -627,7 +627,10 @@ def render_dashboard(lista):
           <div class="db-title">MONITORAMENTO DE ANÁLISE DE ÓLEO</div>
           <div class="db-sub">Gerdau Charqueadas · Engenharia de Manutenção </div>
         </div>
-     
+      </div>
+      <div style="text-align:right">
+      </div>
+    </div>""", unsafe_allow_html=True)
 
     # ── FILTROS DA TELA ──
     setores = ["Todos"] + sorted([str(x) for x in df["Cod2"].dropna().unique().tolist()])
